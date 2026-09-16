@@ -16,9 +16,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
@@ -56,6 +59,10 @@ public class TooltipRenderable extends DefaultRenderable<TooltipPropertyBundle> 
         }
         GuiGraphicsExtractor guiGraphics = new GuiGraphicsExtractor(client, state, xScale, yScale);
         guiGraphics.tooltip(client.font, list, 0, 0, this::positionTooltip, this.stack.get(DataComponents.TOOLTIP_STYLE), false);
+
+        TextureAtlas atlasOrThrow = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.GUI);
+        TextureAtlasSprite sprite = atlasOrThrow.getSprite(this.stack.get(DataComponents.TOOLTIP_STYLE));
+
         WikiRenderer.skipTooltipBackgroundRender = false;
 
 		renderer.render();
@@ -103,7 +110,9 @@ public class TooltipRenderable extends DefaultRenderable<TooltipPropertyBundle> 
             height += component.getHeight(minecraft.font);
         }
 
-        return Math.max(width + 12, height + 12);
+        // use +18 instead of +12 so hypixel skyblock tooltips dont get cropped off
+        // todo: figure out a better way to calculate the spacing on this (since maybe other server/mod tooltips need even more spacing)
+        return Math.max(width + 18, height + 18);
     }
 
     @Override
