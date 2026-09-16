@@ -60,6 +60,7 @@
     "entity.sprite.WolfArmorLayerMixin",
     "screen.AbstractContainerScreenMixin",
     "screen.GuiItemAtlasMixin",
+    "screen.PictureInPictureRendererMixin",
     "screen.RenderTypeMixin",
     "screen.ScreenMixin",
     "texture.AnimationStateMixin",

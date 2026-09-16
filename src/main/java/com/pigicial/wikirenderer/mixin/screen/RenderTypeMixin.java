@@ -14,7 +14,7 @@ public class RenderTypeMixin {
 
     @Inject(method = "writeDynamicTransforms", at = @At("HEAD"))
     private void wikirenderer$onDraw(Matrix4f modelViewMatrix, CallbackInfoReturnable<GpuBufferSlice> cir) {
-        if (WikiRenderer.inContainerScreenDraw && WikiRenderer.inGuiItemAtlasDraw) {
+        if (WikiRenderer.inContainerScreenDraw && (WikiRenderer.inGuiItemAtlasDraw || WikiRenderer.inGuiPictureInPictureDraw)) {
             modelViewMatrix.identity();
         }
     }
