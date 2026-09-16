@@ -209,6 +209,11 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
             }
         };
 
+        // do this here because the bounds calculation calls a render pass, it has to be done before the render pass below is created
+        if (!properties.hideEntities.get()) {
+            this.refreshEntities();
+        }
+
         if (!properties.hideMesh.get()) {
             PoseStack meshStack = new PoseStack();
             meshStack.mulPose(modelViewStack);
@@ -291,7 +296,6 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
 
         List<Integer> animationTimingsToFill = new ArrayList<>();
 
-        this.refreshEntities();
         this.entities.forEach(entity -> {
             if (properties.hiddenEntityTypes.contains(entity.getType())) return;
             if (entity instanceof LivingEntity && properties.hideLivingEntities.get()) return;
