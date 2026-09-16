@@ -68,6 +68,7 @@
     "screen.GuiGraphicsExtractorAccessor",
     "screen.GuiGraphicsExtractorMixin",
     "screen.GuiItemAtlasMixin",
+    "screen.PictureInPictureRendererMixin",
     "screen.RenderTypeMixin",
     "screen.ScreenMixin",
     "screen.StagedVertexBufferDrawAccessor",
