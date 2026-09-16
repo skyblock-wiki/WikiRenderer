@@ -101,16 +101,17 @@ public class ContainerScreenRenderable extends DefaultRenderable<ContainerScreen
         WindowRenderState windowRenderState = Minecraft.getInstance().gameRenderer.gameRenderState().windowRenderState;
         int savedRenderStateGuiScale = windowRenderState.guiScale;
 
-        double normalizedMouseX = Minecraft.getInstance().mouseHandler.xpos();
-        int normalizedWidthLeftOffset = renderScreen.viewportBeginX * savedWindowScale;
-        int widthForMouseCalculation = ((renderScreen.viewportEndX - renderScreen.viewportBeginX) * savedWindowScale);
-        double mouseXInPreview = normalizedMouseX - normalizedWidthLeftOffset;
-        double percentageMouseX = mouseXInPreview / (double) widthForMouseCalculation;
-        int mouseX = (int) (percentageMouseX * framebufferWidth) / guiScale;
+        double currentGuiMouseX = client.mouseHandler.getScaledXPos(window);
+        double currentGuiMouseY = client.mouseHandler.getScaledYPos(window);
 
-        double rawMouseY = Minecraft.getInstance().mouseHandler.ypos();
-        double percentageMouseY = rawMouseY / (double) savedHeight;
-        int mouseY = (int) (percentageMouseY * framebufferHeight) / guiScale;
+        double viewportWidth = renderScreen.viewportEndX - renderScreen.viewportBeginX;
+        double relativeMouseX = currentGuiMouseX - renderScreen.viewportBeginX;
+
+        double percentageMouseX = viewportWidth > 0 ? (relativeMouseX / viewportWidth) : 0.0;
+        double percentageMouseY = window.getGuiScaledHeight() > 0 ? (currentGuiMouseY / (double) window.getGuiScaledHeight()) : 0.0;
+
+        int mouseX = (int) (percentageMouseX * guiScaledWidth);
+        int mouseY = (int) (percentageMouseY * guiScaledHeight);
 
         if (guiRenderer == null) {
             guiRenderer = getGuiRenderer(client);
@@ -120,7 +121,6 @@ public class ContainerScreenRenderable extends DefaultRenderable<ContainerScreen
         window.setHeight(framebufferHeight);
         window.setGuiScale(guiScale);
         windowRenderState.guiScale = guiScale;
-
 
         GuiGraphicsExtractor guiGraphics = new GuiGraphicsExtractor(client, state, mouseX, mouseY);
 
