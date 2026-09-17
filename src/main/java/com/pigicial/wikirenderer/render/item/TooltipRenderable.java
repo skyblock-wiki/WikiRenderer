@@ -108,7 +108,9 @@ public class TooltipRenderable extends DefaultRenderable<TooltipPropertyBundle> 
             height += component.getHeight(minecraft.font);
         }
 
-        return Math.max(width + 12, height + 12);
+        // use +18 instead of +12 so hypixel skyblock tooltips dont get cropped off
+        // todo: figure out a better way to calculate the spacing on this (since maybe other server/mod tooltips need even more spacing)
+        return Math.max(width + 18, height + 18);
     }
 
     @Override
