@@ -301,12 +301,10 @@ public class AreaPropertyBundle extends DefaultCroppablePropertyBundle implement
             }).margins(Insets.of(8, 0, 10, 0));
         }
 
-        if (ClipboardUtil.hasTextClipboardAccess()) {
-            container.child(WikiRendererUI.button(Translate.gui("copy_render_command"), _ -> {
-                screen.notify(Translate.gui("copied_coordinates_command_to_clipboard"));
-                ClipboardUtil.setClipboard(mesh.bounds.generateAreaCommand());
-            }));
-        }
+        container.child(WikiRendererUI.button(Translate.gui("copy_render_command"), _ -> {
+            screen.notify(Translate.gui("copied_coordinates_command_to_clipboard"));
+            ClipboardUtil.setClipboard(mesh.bounds.generateAreaCommand());
+        }));
 
         WikiRendererUI.text(container, "block_visibility", true);
         container.child(this.buildResetBlockAndEntityOverridesButton(screen, renderable));

@@ -131,27 +131,25 @@ public class FrameBasedPropertyBundle<S, R extends Renderable<P>, P extends Prop
             WikiRendererUI.booleanControl(container, ITEM_EXPORT_PROFILE_DATA, "export_profile_data");
         }
 
-        if (ClipboardUtil.hasTextClipboardAccess()) {
-            try (WikiRendererUI.RowBuilder builder = WikiRendererUI.autoNewLineRow(container)) {
-                ButtonComponent copyAnimationDataButton = WikiRendererUI.button(Translate.gui("copy_animation_data"), _ -> {
-                    screen.notify(Translate.gui("copied_animation_data_to_clipboard"));
+        try (WikiRendererUI.RowBuilder builder = WikiRendererUI.autoNewLineRow(container)) {
+            ButtonComponent copyAnimationDataButton = WikiRendererUI.button(Translate.gui("copy_animation_data"), _ -> {
+                screen.notify(Translate.gui("copied_animation_data_to_clipboard"));
 
-                    String text = String.join("\n", frameBasedRenderable.generateWikiTextFile(frameBasedRenderable.currentDataSet));
+                String text = String.join("\n", frameBasedRenderable.generateWikiTextFile(frameBasedRenderable.currentDataSet));
+                ClipboardUtil.setClipboard(text);
+            });
+            copyAnimationDataButton.margins(Insets.bottom(3));
+            builder.row.child(copyAnimationDataButton);
+
+            if (renderable instanceof ItemFrameBasedRenderable itemFrameBasedRenderable) {
+                ButtonComponent copyProfilesButton = WikiRendererUI.button(Translate.gui("copy_profile_data"), _ -> {
+                    screen.notify(Translate.gui("copied_profile_data_to_clipboard"));
+
+                    String text = String.join("\n", itemFrameBasedRenderable.generateProfileJson());
                     ClipboardUtil.setClipboard(text);
                 });
-                copyAnimationDataButton.margins(Insets.bottom(3));
-                builder.row.child(copyAnimationDataButton);
-
-                if (renderable instanceof ItemFrameBasedRenderable itemFrameBasedRenderable) {
-                    ButtonComponent copyProfilesButton = WikiRendererUI.button(Translate.gui("copy_profile_data"), _ -> {
-                        screen.notify(Translate.gui("copied_profile_data_to_clipboard"));
-
-                        String text = String.join("\n", itemFrameBasedRenderable.generateProfileJson());
-                        ClipboardUtil.setClipboard(text);
-                    });
-                    copyProfilesButton.margins(Insets.bottom(9));
-                    builder.row.child(copyProfilesButton);
-                }
+                copyProfilesButton.margins(Insets.bottom(9));
+                builder.row.child(copyProfilesButton);
             }
         }
 

@@ -261,7 +261,7 @@ public class EntityPropertyBundle extends DefaultCroppablePropertyBundle impleme
         }
 
         WikiRendererUI.text(container, "entity_data", 10);
-        if (renderable.liveNonTickableEntity != null && ClipboardUtil.hasTextClipboardAccess()) {
+        if (renderable.liveNonTickableEntity != null) {
             container.child(WikiRendererUI.button(Translate.gui("copy_entity_coordinates"), _ -> {
                 Vec3 coords = renderable.getUsedEntity().position();
 
