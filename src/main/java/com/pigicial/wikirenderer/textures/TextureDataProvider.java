@@ -53,24 +53,22 @@ public interface TextureDataProvider {
                     builder.row.child(UIComponents.label(mergedText).margins(Insets.of(5, 0, 0, 10)));
 
                     builder.row.child(UIComponents.button(Translate.gui("open_url"), button -> Util.getPlatform().openUri(texture.getUrl())));
-                    if (ClipboardUtil.hasTextClipboardAccess()) {
-                        builder.row.child(UIComponents.button(Translate.gui("copy_texture_id"), button -> {
-                            screen.notify(Translate.gui("copied_texture_id_to_clipboard"));
-                            ClipboardUtil.setClipboard(texture.getHash());
-                        }));
+                    builder.row.child(UIComponents.button(Translate.gui("copy_texture_id"), button -> {
+                        screen.notify(Translate.gui("copied_texture_id_to_clipboard"));
+                        ClipboardUtil.setClipboard(texture.getHash());
+                    }));
 
-                        builder.row.child(UIComponents.button(Translate.gui("copy_json"), button -> {
-                            screen.notify(Translate.gui("copied_json_to_clipboard"));
-                            ClipboardUtil.setClipboard(PlayerTextureUtils.GSON.toJson(payload));
-                        }));
+                    builder.row.child(UIComponents.button(Translate.gui("copy_json"), button -> {
+                        screen.notify(Translate.gui("copied_json_to_clipboard"));
+                        ClipboardUtil.setClipboard(PlayerTextureUtils.GSON.toJson(payload));
+                    }));
 
-                        if (!(this instanceof ItemRenderable) && type == MinecraftProfileTexture.Type.SKIN) {
-                            builder.row.child(UIComponents.button(Translate.gui("render_head"), button -> {
-                                ItemStack head = PlayerTextureUtils.createPlayerHead(profile);
-                                ScreenSchedulerAndSaver.setSavedScreen(screen);
-                                ScreenSchedulerAndSaver.openImmediately(new RenderScreen(new ItemRenderable(head)));
-                            }));
-                        }
+                    if (!(this instanceof ItemRenderable) && type == MinecraftProfileTexture.Type.SKIN) {
+                        builder.row.child(UIComponents.button(Translate.gui("render_head"), button -> {
+                            ItemStack head = PlayerTextureUtils.createPlayerHead(profile);
+                            ScreenSchedulerAndSaver.setSavedScreen(screen);
+                            ScreenSchedulerAndSaver.openImmediately(new RenderScreen(new ItemRenderable(head)));
+                        }));
                     }
                 }
             }

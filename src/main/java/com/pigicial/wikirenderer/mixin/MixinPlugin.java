@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
@@ -16,11 +17,16 @@ public class MixinPlugin implements IMixinConfigPlugin {
     static {
         // We force-initialize AWT here so that we can copy stuff to clipboard
         // on macos though, copying images to clipboard isnt supported
-        if (!GraphicsEnvironment.isHeadless()) {
-            try {
-                Toolkit.getDefaultToolkit().getSystemClipboard();
-            } catch (Exception e) {
-                LOGGER.info("Couldn't initialize AWT");
+
+        // calling this method on macos can cause the game to sometimes not launcher
+        // (fixed in 26.3 but whatever im too lazy to properly fix it here (aka add glfw image clipboard support) so this works)
+        if (!System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac")) {
+            if (!GraphicsEnvironment.isHeadless()) {
+                try {
+                    Toolkit.getDefaultToolkit().getSystemClipboard();
+                } catch (Exception e) {
+                    LOGGER.info("Couldn't initialize AWT", e);
+                }
             }
         }
     }
