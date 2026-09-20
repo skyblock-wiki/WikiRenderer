@@ -136,6 +136,7 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
     private double[] scrollOffsetData = null;
     public int mouseX;
     public int mouseY;
+    private boolean clickedOnceBefore; // for some reason in 26.3 dragging is occurring even when you haven't clicked yet, this is kind of a fix for that
 
     private AbstractContainerScreen<?> previouslyOpenedContainerScreen = null;
 
@@ -772,6 +773,7 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent click, double offsetX, double offsetY) {
+        if (!clickedOnceBefore) return false;
         if (!(this.renderable.getProperties() instanceof DefaultPropertyBundle properties))
             return super.mouseDragged(click, offsetX, offsetY);
 
@@ -798,6 +800,7 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
+        this.clickedOnceBefore = true;
         if (!(this.renderable.getProperties() instanceof DefaultPropertyBundle properties))
             return super.mouseClicked(click, doubled);
 
