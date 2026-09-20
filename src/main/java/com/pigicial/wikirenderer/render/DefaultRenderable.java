@@ -8,7 +8,6 @@ import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.commands.RenderPass;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.mixin.access.GameRendererAccessor;
-import com.pigicial.wikirenderer.mixin.access.LevelRendererAccessor;
 import com.pigicial.wikirenderer.mixin.access.LightmapRenderStateExtractorAccessor;
 import com.pigicial.wikirenderer.property.DefaultPropertyBundle;
 import net.minecraft.client.Minecraft;
@@ -121,7 +120,7 @@ public abstract class DefaultRenderable<P extends DefaultPropertyBundle> impleme
         }
 
         // Draw all buffers
-        SubmitNodeStorage submitNodeStorage = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).wikirenderer$getSubmitNodeStorage();
+        SubmitNodeStorage submitNodeStorage = WikiRenderer.NODE_STORAGE;
         FeatureRenderDispatcher featureRenderDispatcher = Minecraft.getInstance().gameRenderer.featureRenderDispatcher();
         try (FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(submitNodeStorage)) {
             RenderTarget mainTarget = WikiRenderer.mainTargetOverride == null ? Minecraft.getInstance().gameRenderer.mainRenderTarget() : WikiRenderer.mainTargetOverride;

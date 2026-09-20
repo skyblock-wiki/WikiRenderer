@@ -4,7 +4,6 @@ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.mixin.access.ItemStackRenderStateAccessor;
-import com.pigicial.wikirenderer.mixin.access.LevelRendererAccessor;
 import com.pigicial.wikirenderer.property.IntProperty;
 import com.pigicial.wikirenderer.render.batch.DynamicBatchLabelProvider;
 import com.pigicial.wikirenderer.render.export.ExportPathSpec;
@@ -131,7 +130,7 @@ public class ItemRenderable extends ItemBasedRenderable<ItemRenderablePropertyBu
 
     @Override
     public void emitVerticesThenDraw(RenderScreen renderScreen, Matrix4fStack matrix4fStack, PoseStack matrices, float tickDelta, long timeSinceCreationMs) {
-        SubmitNodeStorage nodeStorage = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).wikirenderer$getSubmitNodeStorage();
+        SubmitNodeStorage nodeStorage = WikiRenderer.NODE_STORAGE;
 
         ((ItemStackRenderStateAccessor) RENDER_STATE).wikirenderer$setDisplayContext(ItemDisplayContext.GUI);
         RENDER_STATE.submit(matrices, nodeStorage, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);

@@ -34,6 +34,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Lightmap;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import org.joml.Matrix4f;
@@ -49,6 +50,9 @@ public class WikiRenderer implements ClientModInitializer {
 	public static final String MOD_ID = "wikirenderer";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final String VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
+
+    // forces OIT to off (makes things simpler)
+    public static final SubmitNodeStorage NODE_STORAGE = new SubmitNodeStorage();
 
     public static AnimationHandler currentAnimationHandler = null;
     public static ParticleDisplayCondition particleDisplayCondition = ParticleDisplayCondition.SHOW_ALL;

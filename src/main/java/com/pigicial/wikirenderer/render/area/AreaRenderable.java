@@ -2,12 +2,9 @@ package com.pigicial.wikirenderer.render.area;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.renderpearl.api.commands.RenderPass;
 import com.pigicial.wikirenderer.WikiRenderer;
-import com.pigicial.wikirenderer.screen.components.EntityTypeSpecificPropertiesComponent;
 import com.pigicial.wikirenderer.mixin.access.GameRendererAccessor;
 import com.pigicial.wikirenderer.mixin.access.ItemStackRenderStateAccessor;
-import com.pigicial.wikirenderer.mixin.access.LevelRendererAccessor;
 import com.pigicial.wikirenderer.property.GlobalProperties;
 import com.pigicial.wikirenderer.property.IntProperty;
 import com.pigicial.wikirenderer.render.CameraUtil;
@@ -29,6 +26,7 @@ import com.pigicial.wikirenderer.render.item.AnimationTimingsProvider;
 import com.pigicial.wikirenderer.render.particle.ParticleDisplayCondition;
 import com.pigicial.wikirenderer.render.particle.ParticleRendererAndLooper;
 import com.pigicial.wikirenderer.screen.RenderScreen;
+import com.pigicial.wikirenderer.screen.components.EntityTypeSpecificPropertiesComponent;
 import com.pigicial.wikirenderer.util.*;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Camera;
@@ -41,7 +39,6 @@ import net.minecraft.client.renderer.GlobalSettingsUniform;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.*;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -61,7 +58,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -177,7 +173,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
         double ySize = boundingBox.getYsize();
         double zSize = boundingBox.getZsize();
 
-        SubmitNodeStorage nodeStorage = ((LevelRendererAccessor) client.levelRenderer).wikirenderer$getSubmitNodeStorage();
+        SubmitNodeStorage nodeStorage = WikiRenderer.NODE_STORAGE;
         CameraRenderState cameraRenderState = CameraUtil.createRenderState(this);
 
         standardStack.setIdentity();
@@ -423,8 +419,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
 
         if (!state.shadowPieces.isEmpty()) {
             if (properties.hideMesh.get()) {
-                // todo enable this again
-                // state.shadowPieces.clear();
+                state.shadowPieces.clear();
             } else {
                 // increase shadow height by a tiny amount to fix z-fighting, +0.001 is enough
                 List<EntityRenderState.ShadowPiece> newPieces = state.shadowPieces

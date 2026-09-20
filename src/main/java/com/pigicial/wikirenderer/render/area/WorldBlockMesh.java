@@ -15,7 +15,6 @@ import com.mojang.renderpearl.api.textures.GpuSampler;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.mojang.renderpearl.api.vertex.VertexFormat;
 import com.pigicial.wikirenderer.WikiRenderer;
-import com.pigicial.wikirenderer.mixin.access.LevelRendererAccessor;
 import com.pigicial.wikirenderer.render.OrthographicSort;
 import com.pigicial.wikirenderer.render.area.bounds.MeshBounds;
 import com.pigicial.wikirenderer.render.area.side_view.WalkabilityFilter;
@@ -50,7 +49,6 @@ import org.joml.Matrix4fc;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 
 // todo: not a fan of how entities are handled in AreaRenderable and blocks are here, maybe they should be merged
 public class WorldBlockMesh {
@@ -151,7 +149,7 @@ public class WorldBlockMesh {
 
         RenderTarget mainTarget = WikiRenderer.mainTargetOverride == null ? Minecraft.getInstance().gameRenderer.mainRenderTarget() : WikiRenderer.mainTargetOverride;
 
-        SubmitNodeStorage submitNodeStorage = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).wikirenderer$getSubmitNodeStorage();
+        SubmitNodeStorage submitNodeStorage = WikiRenderer.NODE_STORAGE;
         FeatureRenderDispatcher featureRenderDispatcher = Minecraft.getInstance().gameRenderer.featureRenderDispatcher();
         try (FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(submitNodeStorage)) {
             try (RenderPass renderPass = RenderSystem.getDevice()

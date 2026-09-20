@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.mixin.access.BlockEntityAccessor;
 import com.pigicial.wikirenderer.mixin.access.BlockEntityRenderDispatcherAccessor;
-import com.pigicial.wikirenderer.mixin.access.LevelRendererAccessor;
 import com.pigicial.wikirenderer.property.GlobalProperties;
 import com.pigicial.wikirenderer.render.CameraUtil;
 import com.pigicial.wikirenderer.render.TickingRenderable;
@@ -121,7 +120,7 @@ public class BlockStateRenderable
         matrices.pushPose();
         matrices.translate(-0.5, -0.5, -0.5);
 
-        SubmitNodeStorage submitNodeCollector = ((LevelRendererAccessor) this.client.levelRenderer).wikirenderer$getSubmitNodeStorage();
+        SubmitNodeStorage submitNodeCollector = WikiRenderer.NODE_STORAGE;
 
         // renders the main stuff
         if (this.state.getRenderShape() != RenderShape.INVISIBLE) {

@@ -3,10 +3,8 @@ package com.pigicial.wikirenderer.render.entity;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.pigicial.wikirenderer.WikiRenderer;
-import com.pigicial.wikirenderer.screen.components.EntityTypeSpecificPropertiesComponent;
 import com.pigicial.wikirenderer.mixin.access.ClientMannequinAccessor;
 import com.pigicial.wikirenderer.mixin.access.ItemStackRenderStateAccessor;
-import com.pigicial.wikirenderer.mixin.access.LevelRendererAccessor;
 import com.pigicial.wikirenderer.mixin.access.MannequinAccessor;
 import com.pigicial.wikirenderer.render.CameraUtil;
 import com.pigicial.wikirenderer.render.DefaultRenderable;
@@ -19,6 +17,7 @@ import com.pigicial.wikirenderer.render.item.AnimationTimingsProvider;
 import com.pigicial.wikirenderer.render.particle.ParticleDisplayCondition;
 import com.pigicial.wikirenderer.render.particle.ParticleRendererAndLooper;
 import com.pigicial.wikirenderer.screen.RenderScreen;
+import com.pigicial.wikirenderer.screen.components.EntityTypeSpecificPropertiesComponent;
 import com.pigicial.wikirenderer.textures.PlayerTextureUtils;
 import com.pigicial.wikirenderer.textures.TextureData;
 import com.pigicial.wikirenderer.textures.TextureDataProvider;
@@ -242,7 +241,7 @@ public class EntityRenderable extends DefaultRenderable<EntityPropertyBundle> im
             WikiRenderer.inSpriteEntityDraw = properties.spriteRendering.get();
 
             EntityRenderDispatcher renderDispatcher = client.getEntityRenderDispatcher();
-            SubmitNodeStorage nodeStorage = ((LevelRendererAccessor) client.levelRenderer).wikirenderer$getSubmitNodeStorage();
+            SubmitNodeStorage nodeStorage = WikiRenderer.NODE_STORAGE;
 
             EntityRenderState state = renderDispatcher.extractEntity(entity, properties.tickEntityAnimations.get() && !entity.isRemoved() ? tickDelta : 0);
 
