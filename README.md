@@ -6,7 +6,7 @@ These are automatically keyed to have a transparent background, and you can adju
 options right in-game in a menu.
 
 Not only is this version of the mod also designed for modded wikis in mind, but it also has a couple of additional
-features targeted for use on the [Hypixel SkyBlock Independent Wiki](https://hypixelskyblock.minecraft.wiki).
+features targeted for use on the [Hypixel SkyBlock Wiki](https://hypixelskyblock.minecraft.wiki).
 
 Note: Starting with Minecraft 26.3, WikiRenderer embeds the UI system from [owo-lib](https://modrinth.com/mod/owo-lib) directly into the mod, needing it is no longer required as a separate dependency.
 

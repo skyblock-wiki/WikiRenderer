@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * For usage on <a href="https://hypixelskyblock.minecraft.wiki/w/Module:Minimap/Datasheet">the Hypixel SkyBlock Fandom wiki's Module:Minimap/Datasheet Minimap Calibrator tool</a>
+ * For usage on <a href="https://hypixelskyblock.minecraft.wiki/w/Module:Minimap/Datasheet">the Hypixel SkyBlock Wiki's Module:Minimap/Datasheet Minimap Calibrator tool</a>
  */
 public record MinimapCalibratorData(
         int topLeftImagePixelX,
