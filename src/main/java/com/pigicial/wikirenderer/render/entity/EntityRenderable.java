@@ -317,7 +317,7 @@ public class EntityRenderable extends DefaultRenderable<EntityPropertyBundle> im
             }
             matrices.translate(-cameraDifference.x, -cameraDifference.y, -cameraDifference.z);
 
-            ParticleRendererAndLooper.drawParticles(this, matrices.last().pose(), delta);
+            ParticleRendererAndLooper.submitAndDrawParticles(this, matrices.last().pose(), delta);
             matrices.popPose();
         }
 

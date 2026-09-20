@@ -31,7 +31,15 @@ public class ParticleRendererAndLooper {
     public static boolean renderingAndSavingParticlesForLooping = false;
     public static boolean loopingParticles = false;
 
-    public static void drawParticles(Renderable<? extends DefaultPropertyBundle> renderable, Matrix4f transform, float tickDelta) {
+    public static void submitParticlesOnly(Renderable<? extends DefaultPropertyBundle> renderable, Matrix4f transform, float tickDelta) {
+        submitParticles(renderable, transform, tickDelta, false);
+    }
+
+    public static void submitAndDrawParticles(Renderable<? extends DefaultPropertyBundle> renderable, Matrix4f transform, float tickDelta) {
+        submitParticles(renderable, transform, tickDelta, true);
+    }
+
+    private static void submitParticles(Renderable<? extends DefaultPropertyBundle> renderable, Matrix4f transform, float tickDelta, boolean drawHere) {
         if (!GlobalProperties.get().tickParticles.get()) {
             return;
         }
@@ -98,7 +106,9 @@ public class ParticleRendererAndLooper {
             }
         }
 
-        renderable.drawSubmittedRenderFeatures();
+        if (drawHere) {
+            renderable.drawSubmittedRenderFeatures();
+        }
         particleBatch.reset();
 
         loopingParticles = false;

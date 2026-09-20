@@ -62,7 +62,6 @@ import org.joml.Matrix4fStack;
 
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -185,44 +184,39 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
         standardStack.translate(-xSize / 2f, -ySize / 2f, -zSize / 2f);
 
         BlockPos minCorner = mesh.bounds.getMinCorner();
+        if (client.player != null) {
+            Camera camera = CameraUtil.getCamera();
+            Vec3 cameraPosition = camera != null ? camera.position() : client.player.getEyePosition();
+            Vec3 particleOffset = Vec3.atLowerCornerOf(minCorner).subtract(cameraPosition);
 
-        // this could be better but whatever
-        BiConsumer<RenderPass, FeatureRenderDispatcher.PreparedFrame> preTranslucencyTask = (pass, frame) -> {
-            if (!properties.hideMesh.get()) {
-                this.mesh.drawBlockEntities(standardStack, nodeStorage, cameraRenderState, tickDelta, pass, frame);
-            }
+            PoseStack particleStack = new PoseStack();
+            particleStack.mulPose(standardStack.last().pose());
 
-            if (client.player != null) {
-                Camera camera = CameraUtil.getCamera();
-                Vec3 cameraPosition = camera != null ? camera.position() : client.player.getEyePosition();
-                Vec3 particleOffset = Vec3.atLowerCornerOf(minCorner).subtract(cameraPosition);
+            particleStack.translate(-particleOffset.x, -particleOffset.y, -particleOffset.z);
 
-                standardStack.pushPose();
-                standardStack.translate(-particleOffset.x, -particleOffset.y, -particleOffset.z);
-                ParticleRendererAndLooper.drawParticles(this, standardStack.last().pose(), tickDelta);
-                standardStack.popPose();
-            }
+            // this calls a new render pass / feature frame, do it early
+            ParticleRendererAndLooper.submitAndDrawParticles(this, particleStack.last().pose(), tickDelta);
+        }
 
-            drawnVertexBoundCache.clear();
-            if (!properties.hideEntities.get()) {
-                this.drawEntities(cameraRenderState, tickDelta, standardStack, nodeStorage, pass, frame);
-            }
-        };
+        if (!properties.hideMesh.get()) {
+            this.mesh.drawBlockEntities(standardStack, nodeStorage, cameraRenderState, tickDelta);
+        }
 
-        // do this here because the bounds calculation calls a render pass, it has to be done before the render pass below is created
+        // do this here because the bounds calculation calls a render pass / feature frame, it has to be done before the render pass below is created
+        this.refreshEntities();
         if (!properties.hideEntities.get()) {
-            this.refreshEntities();
+            this.drawEntities(cameraRenderState, tickDelta, standardStack, nodeStorage);
         }
 
         if (!properties.hideMesh.get()) {
             PoseStack meshStack = new PoseStack();
             meshStack.mulPose(modelViewStack);
             meshStack.translate(-xSize / 2f, -ySize / 2f, -zSize / 2f);
-            meshStack.translate(-minCorner.getX(), -minCorner.getY(),- minCorner.getZ());
+            meshStack.translate(-minCorner.getX(), -minCorner.getY(), -minCorner.getZ());
 
-            this.mesh.drawBlocks(meshStack, preTranslucencyTask);
+            this.mesh.drawBlocks(meshStack);
         } else {
-            preTranslucencyTask.accept(null, null); // run otherwise above
+            this.drawSubmittedRenderFeatures();
         }
 
         WikiRenderer.inAreaRenderDraw = false;
@@ -284,8 +278,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
         this.entitiesFrozen = false;
     }
 
-    private void drawEntities(CameraRenderState cameraRenderState, float delta, PoseStack standardStack, SubmitNodeStorage nodeStorage,
-                              @Nullable RenderPass pass, @Nullable FeatureRenderDispatcher.PreparedFrame frame) {
+    private void drawEntities(CameraRenderState cameraRenderState, float delta, PoseStack standardStack, SubmitNodeStorage nodeStorage) {
         float tickDelta = entitiesFrozen ? 0 : delta;
         AreaPropertyBundle properties = this.getProperties();
         EntityRenderDispatcher entityDispatcher = client.getEntityRenderDispatcher();
@@ -321,7 +314,6 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
             WikiRenderer.animationTimingDataRequestedToFill = null;
 
         });
-        super.drawSubmittedRenderFeatures(pass, frame);
 
         this.lastSeenEntityAnimationTimings = animationTimingsToFill;
         WikiRenderer.animationTimingDataRequestedToFill = null;
@@ -431,7 +423,8 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
 
         if (!state.shadowPieces.isEmpty()) {
             if (properties.hideMesh.get()) {
-                state.shadowPieces.clear();
+                // todo enable this again
+                // state.shadowPieces.clear();
             } else {
                 // increase shadow height by a tiny amount to fix z-fighting, +0.001 is enough
                 List<EntityRenderState.ShadowPiece> newPieces = state.shadowPieces

@@ -112,7 +112,7 @@ public class WorldBlockMesh {
         return !currentlyFullyBuilding;
     }
 
-    public void drawBlocks(PoseStack matrices, BiConsumer<RenderPass, FeatureRenderDispatcher.PreparedFrame> preTranslucencyTask) {
+    public void drawBlocks(PoseStack matrices) {
         if (!this.getMeshState().canRender) {
             throw new IllegalStateException("World mesh not prepared!");
         }
@@ -159,18 +159,17 @@ public class WorldBlockMesh {
                     .createRenderPass(() -> "Mesh Main", mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
                 RenderSystem.bindDefaultUniforms(renderPass);
 
-                for (ChunkSectionLayerGroup sectionLayer : new ChunkSectionLayerGroup[]{ChunkSectionLayerGroup.OPAQUE, ChunkSectionLayerGroup.TRANSLUCENT}) {
-                    if (sectionLayer == ChunkSectionLayerGroup.TRANSLUCENT) {
-                        preTranslucencyTask.accept(renderPass, frame);
-                    }
-                    overrideTerrainTransparencyRenderPipelines = sectionLayer == ChunkSectionLayerGroup.OPAQUE;
+                // solids
+                GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
 
-                    GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
-                    sections.renderGroup(sectionLayer, renderPass, terrainSampler, blockAtlas, false);
-                }
+                sections.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, false);
+                frame.executeSolid(renderPass);
+                frame.executeTranslucent(renderPass);
+                sections.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, false);
+                frame.executeTranslucentAfterTerrain(renderPass);
+                // renderable.drawSubmittedRenderFeatures(renderPass, frame);
             }
         }
-
 
         sectionRenderDispatcher.lock();
         try {
@@ -394,8 +393,7 @@ public class WorldBlockMesh {
         return new ChunkSectionsToRender.DrawIndirect(terrainTransformUbo, indirectDraws, largestIndexCount, chunkSectionInfos);
     }
 
-    public void drawBlockEntities(PoseStack standardStack, SubmitNodeStorage nodeStorage, CameraRenderState cameraRenderState, float tickDelta,
-                                  @Nullable RenderPass pass, @Nullable FeatureRenderDispatcher.PreparedFrame frame) {
+    public void drawBlockEntities(PoseStack standardStack, SubmitNodeStorage nodeStorage, CameraRenderState cameraRenderState, float tickDelta) {
         BlockPos minCorner = bounds.getMinCorner();
         standardStack.pushPose();
         standardStack.translate(-minCorner.getX(), -minCorner.getY(), -minCorner.getZ());
@@ -437,7 +435,6 @@ public class WorldBlockMesh {
         }
 
         standardStack.popPose();
-        renderable.drawSubmittedRenderFeatures(pass, frame);
         EntityCullingCheck.reEnableBlockEntityCullingIfNecessary();
     }
 

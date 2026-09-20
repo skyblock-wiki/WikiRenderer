@@ -149,7 +149,7 @@ public class BlockStateRenderable
         if (zOffset < 0) zOffset += 1;
 
         matrices.translate(xOffset, 1.65 + this.client.player.getY() % 1d, zOffset);
-        ParticleRendererAndLooper.drawParticles(this, matrices.last().pose(), tickDelta);
+        ParticleRendererAndLooper.submitAndDrawParticles(this, matrices.last().pose(), tickDelta);
 
         matrices.popPose();
     }
