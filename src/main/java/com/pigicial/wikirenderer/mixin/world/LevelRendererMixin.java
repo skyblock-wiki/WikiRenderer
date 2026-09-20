@@ -46,14 +46,4 @@ public class LevelRendererMixin {
             WorldBlockMesh.terrainSampler = null;
         }
     }
-
-    /*
-    // todo somehow redo this maybe
-    @Inject(method = "particlesTarget", at = @At("HEAD"), cancellable = true)
-    private void overrideParticlesTarget(CallbackInfoReturnable<RenderTarget> cir) {
-        if (WikiRenderer.mainTargetOverride != null) {
-            cir.setReturnValue(WikiRenderer.mainTargetOverride);
-        }
-    }
-     */
 }

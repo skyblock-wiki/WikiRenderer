@@ -37,6 +37,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GlobalSettingsUniform;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -195,25 +196,26 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
         }
 
         if (!properties.hideMesh.get()) {
-            this.mesh.drawBlockEntities(standardStack, nodeStorage, cameraRenderState, tickDelta);
+            this.mesh.submitBlockEntities(standardStack, nodeStorage, cameraRenderState, tickDelta);
         }
 
         // do this here because the bounds calculation calls a render pass / feature frame, it has to be done before the render pass below is created
         this.refreshEntities();
         if (!properties.hideEntities.get()) {
-            this.drawEntities(cameraRenderState, tickDelta, standardStack, nodeStorage);
+            this.submitEntities(cameraRenderState, tickDelta, standardStack, nodeStorage);
         }
 
+        ChunkSectionsToRender blocksToRender = null;
         if (!properties.hideMesh.get()) {
             PoseStack meshStack = new PoseStack();
             meshStack.mulPose(modelViewStack);
             meshStack.translate(-xSize / 2f, -ySize / 2f, -zSize / 2f);
             meshStack.translate(-minCorner.getX(), -minCorner.getY(), -minCorner.getZ());
 
-            this.mesh.drawBlocks(meshStack);
-        } else {
-            this.drawSubmittedRenderFeatures();
+            blocksToRender = this.mesh.getBlocksToRender(meshStack);
         }
+
+        this.mesh.drawItAll(blocksToRender);
 
         WikiRenderer.inAreaRenderDraw = false;
     }
@@ -274,7 +276,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
         this.entitiesFrozen = false;
     }
 
-    private void drawEntities(CameraRenderState cameraRenderState, float delta, PoseStack standardStack, SubmitNodeStorage nodeStorage) {
+    private void submitEntities(CameraRenderState cameraRenderState, float delta, PoseStack standardStack, SubmitNodeStorage nodeStorage) {
         float tickDelta = entitiesFrozen ? 0 : delta;
         AreaPropertyBundle properties = this.getProperties();
         EntityRenderDispatcher entityDispatcher = client.getEntityRenderDispatcher();

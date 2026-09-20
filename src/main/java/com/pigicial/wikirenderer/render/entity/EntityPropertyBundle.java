@@ -1,8 +1,6 @@
 package com.pigicial.wikirenderer.render.entity;
 
 import com.mojang.math.Axis;
-import com.pigicial.wikirenderer.screen.components.AutoResizingLabelComponent;
-import com.pigicial.wikirenderer.screen.components.SearchableEntityListComponent;
 import com.pigicial.wikirenderer.mixin.access.LivingEntityRendererAccessor;
 import com.pigicial.wikirenderer.property.*;
 import com.pigicial.wikirenderer.property.config.WikiRendererConfigs;
@@ -10,6 +8,8 @@ import com.pigicial.wikirenderer.render.Renderable;
 import com.pigicial.wikirenderer.render.export.ImageRescaleMode;
 import com.pigicial.wikirenderer.screen.RenderScreen;
 import com.pigicial.wikirenderer.screen.WikiRendererUI;
+import com.pigicial.wikirenderer.screen.components.AutoResizingLabelComponent;
+import com.pigicial.wikirenderer.screen.components.SearchableEntityListComponent;
 import com.pigicial.wikirenderer.screen.owo.component.LabelComponent;
 import com.pigicial.wikirenderer.screen.owo.component.TextBoxComponent;
 import com.pigicial.wikirenderer.screen.owo.container.FlowLayout;

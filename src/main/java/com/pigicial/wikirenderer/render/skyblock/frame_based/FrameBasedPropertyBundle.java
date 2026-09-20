@@ -1,10 +1,10 @@
 package com.pigicial.wikirenderer.render.skyblock.frame_based;
 
-import com.pigicial.wikirenderer.screen.components.DynamicItemsListComponent;
 import com.pigicial.wikirenderer.property.*;
 import com.pigicial.wikirenderer.render.Renderable;
 import com.pigicial.wikirenderer.screen.RenderScreen;
 import com.pigicial.wikirenderer.screen.WikiRendererUI;
+import com.pigicial.wikirenderer.screen.components.DynamicItemsListComponent;
 import com.pigicial.wikirenderer.screen.owo.component.ButtonComponent;
 import com.pigicial.wikirenderer.screen.owo.container.FlowLayout;
 import com.pigicial.wikirenderer.screen.owo.core.Insets;

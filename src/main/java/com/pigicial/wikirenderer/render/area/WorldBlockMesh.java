@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.IndexType;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.textures.AddressMode;
@@ -110,7 +111,7 @@ public class WorldBlockMesh {
         return !currentlyFullyBuilding;
     }
 
-    public void drawBlocks(PoseStack matrices) {
+    public ChunkSectionsToRender getBlocksToRender(PoseStack matrices) {
         if (!this.getMeshState().canRender) {
             throw new IllegalStateException("World mesh not prepared!");
         }
@@ -147,8 +148,13 @@ public class WorldBlockMesh {
             sections = this.prepareChunkRenders(matrices.last().pose(), !Minecraft.getInstance().gameRenderer.useImprovedTransparency());
         }
 
+        return sections;
+    }
+
+    public void drawItAll(@Nullable ChunkSectionsToRender blocksToRender) {
         RenderTarget mainTarget = WikiRenderer.mainTargetOverride == null ? Minecraft.getInstance().gameRenderer.mainRenderTarget() : WikiRenderer.mainTargetOverride;
 
+        // based on LevelRenderer#addMainPass
         SubmitNodeStorage submitNodeStorage = WikiRenderer.NODE_STORAGE;
         FeatureRenderDispatcher featureRenderDispatcher = Minecraft.getInstance().gameRenderer.featureRenderDispatcher();
         try (FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(submitNodeStorage)) {
@@ -157,15 +163,27 @@ public class WorldBlockMesh {
                     .createRenderPass(() -> "Mesh Main", mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
                 RenderSystem.bindDefaultUniforms(renderPass);
 
-                // solids
                 GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
+                if (blocksToRender != null) {
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, false);
+                }
 
-                sections.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, false);
                 frame.executeSolid(renderPass);
-                frame.executeTranslucent(renderPass);
-                sections.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, false);
+
+                frame.executeTranslucent(renderPass); // this requires non-OIT, which is why there's WikiRenderer.NODE_STORAGE (defaults to non-oit)
+                if (blocksToRender != null) {
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, false);
+                }
                 frame.executeTranslucentAfterTerrain(renderPass);
-                // renderable.drawSubmittedRenderFeatures(renderPass, frame);
+            }
+
+            if (frame.hasAnySeeThrough()) {
+                RenderPassDescriptor descriptor = RenderPassDescriptor.builder(() -> "Mesh see through features").withColorAttachment(mainTarget.getColorTextureView()).build();
+
+                try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(descriptor)) {
+                    RenderSystem.bindDefaultUniforms(renderPass);
+                    frame.executeSeeThrough(renderPass);
+                }
             }
         }
 
@@ -391,7 +409,7 @@ public class WorldBlockMesh {
         return new ChunkSectionsToRender.DrawIndirect(terrainTransformUbo, indirectDraws, largestIndexCount, chunkSectionInfos);
     }
 
-    public void drawBlockEntities(PoseStack standardStack, SubmitNodeStorage nodeStorage, CameraRenderState cameraRenderState, float tickDelta) {
+    public void submitBlockEntities(PoseStack standardStack, SubmitNodeStorage nodeStorage, CameraRenderState cameraRenderState, float tickDelta) {
         BlockPos minCorner = bounds.getMinCorner();
         standardStack.pushPose();
         standardStack.translate(-minCorner.getX(), -minCorner.getY(), -minCorner.getZ());
