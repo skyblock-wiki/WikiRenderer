@@ -1,6 +1,6 @@
 package com.pigicial.wikirenderer.screen.owo.core;
 
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.mixin.screen.GuiGraphicsExtractorAccessor;
 import com.pigicial.wikirenderer.screen.owo.event.WindowResizeCallback;

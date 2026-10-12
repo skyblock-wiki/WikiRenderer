@@ -76,7 +76,7 @@
     "texture.AnimationStateMixin",
     "texture.ItemStackMixin",
     "texture.SelectItemModelMixin",
-    "texture.TextureManagerMixin",
+    "texture.AtlasManagerMixin",
     "texture.TextureTransformMixin",
     "texture.UnbakedSwitchMixin",
     "world.BlockEntityRenderDispatcherMixin",

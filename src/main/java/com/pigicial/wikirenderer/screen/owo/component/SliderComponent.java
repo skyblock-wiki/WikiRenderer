@@ -27,7 +27,7 @@ public class SliderComponent extends AbstractSliderButton {
     }
 
     public SliderComponent value(double value) {
-        value = Mth.clamp(value, 0, 1);
+        value = Math.clamp(value, 0, 1);
 
         if (this.value != value) {
             this.value = value;

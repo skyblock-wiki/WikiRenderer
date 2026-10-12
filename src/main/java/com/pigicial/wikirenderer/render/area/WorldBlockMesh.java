@@ -4,6 +4,7 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
@@ -14,7 +15,6 @@ import com.mojang.renderpearl.api.textures.AddressMode;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.mojang.renderpearl.api.textures.GpuSampler;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
-import com.mojang.renderpearl.api.vertex.VertexFormat;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.render.OrthographicSort;
 import com.pigicial.wikirenderer.render.area.bounds.MeshBounds;
@@ -163,16 +163,16 @@ public class WorldBlockMesh {
                     .createRenderPass(() -> "Mesh Main", mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
                 RenderSystem.bindDefaultUniforms(renderPass);
 
-                GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
+                GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).textureView();
                 if (blocksToRender != null) {
-                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, false);
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, null, false);
                 }
 
                 frame.executeSolid(renderPass);
 
                 frame.executeTranslucent(renderPass); // this requires non-OIT, which is why there's WikiRenderer.NODE_STORAGE (defaults to non-oit)
                 if (blocksToRender != null) {
-                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, false);
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, null, false);
                 }
                 frame.executeTranslucentAfterTerrain(renderPass);
             }
@@ -241,7 +241,7 @@ public class WorldBlockMesh {
                             }
 
                             int combinedHash = 173;
-                            VertexFormat vertexFormat = layer.pipeline(false).getVertexFormatBinding(0);
+                            VertexFormat vertexFormat = layer.pipeline(false, false).getVertexFormatBinding(0);
                             GpuBuffer vertexBuffer = slice.vertexBuffer();
                             combinedHash = 31 * combinedHash + vertexBuffer.hashCode();
                             int firstIndex = 0;
@@ -296,7 +296,7 @@ public class WorldBlockMesh {
         Map<ChunkSectionLayer, List<ChunkDrawGroup>> drawGroups = Util.makeEnumMap(ChunkSectionLayer.class, _ -> new ReferenceArrayList<>());
         List<DynamicGpuData.ChunkSectionInfo> sectionInfos = new ArrayList<>();
 
-        GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
+        GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).textureView();
         int textureAtlasWidth = blockAtlas.getWidth(0);
         int textureAtlasHeight = blockAtlas.getHeight(0);
 
@@ -353,7 +353,7 @@ public class WorldBlockMesh {
         }
 
         List<DynamicGpuData.ChunkSectionInfo> sectionInfos = new ArrayList<>();
-        GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
+        GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).textureView();
         int textureAtlasWidth = blockAtlas.getWidth(0);
         int textureAtlasHeight = blockAtlas.getHeight(0);
         int largestIndexCount = this.extractSectionDrawGroups(respectTranslucentOrder, sectionInfos, drawGroups);

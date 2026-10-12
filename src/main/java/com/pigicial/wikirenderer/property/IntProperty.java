@@ -1,7 +1,5 @@
 package com.pigicial.wikirenderer.property;
 
-import net.minecraft.util.Mth;
-
 public class IntProperty extends NumberProperty<Integer> {
 
     private IntProperty(int defaultValue, int min, int max) {
@@ -66,7 +64,7 @@ public class IntProperty extends NumberProperty<Integer> {
             if (this.value > this.max) this.value -= this.span;
             if (this.value < this.min) this.value += this.span;
         } else {
-            this.value = Mth.clamp(this.value + by, this.min, this.max);
+            this.value = Math.clamp(this.value + by, this.min, this.max);
         }
 
         value = Math.min(max, Math.max(value, min));

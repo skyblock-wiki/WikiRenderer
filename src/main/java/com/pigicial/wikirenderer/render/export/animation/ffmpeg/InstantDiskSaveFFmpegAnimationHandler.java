@@ -35,7 +35,7 @@ public final class InstantDiskSaveFFmpegAnimationHandler extends FFmpegAnimation
 
         GlobalProperties globalProperties = GlobalProperties.get();
         if (globalProperties.syncTextureAnimationsToAnimation.get()) {
-            Minecraft.getInstance().getTextureManager().tick();
+            Minecraft.getInstance().getAtlasManager().tick();
         }
 
         GpuTexture texture = RenderableDispatcher.drawIntoTexture(this.screen, this.renderable, effectiveTickDelta, screen.getTimeSinceCreationMs(), renderable.getExportResolution());

@@ -1,6 +1,6 @@
 package com.pigicial.wikirenderer.mixin.world;
 
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.pigicial.wikirenderer.render.area.WorldBlockMesh;
 import com.pigicial.wikirenderer.render.export.CustomRenderPipelines;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinChunkSectionLayer {
 
     @Inject(method = "pipeline", at = @At("HEAD"), cancellable = true)
-    private void onGetPipeline(boolean multiDraw, CallbackInfoReturnable<RenderPipeline> cir) {
+    private void onGetPipeline(boolean multiDraw, boolean cloudsInFog, CallbackInfoReturnable<RenderPipeline> cir) {
         ChunkSectionLayer layer = (ChunkSectionLayer) (Object) this;
 
         if (WorldBlockMesh.overrideTerrainTransparencyRenderPipelines) {

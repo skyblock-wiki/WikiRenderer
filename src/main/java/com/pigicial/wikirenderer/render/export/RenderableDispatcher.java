@@ -248,7 +248,8 @@ public class RenderableDispatcher {
             GpuBuffer gpuBuffer = RenderSystem.getDevice().createBuffer(() -> "WikiRenderer RenderableDispatcher.copyTextureIntoImage buffer", GpuBuffer.USAGE_MAP_READ | GpuBuffer.USAGE_COPY_DST, 4L * width * height);
             try {
                 CommandEncoder commandEncoder = RenderSystem.getDevice().createCommandEncoder();
-                commandEncoder.copyTextureToBuffer(gpuTexture, gpuBuffer, 0, () -> {
+                commandEncoder.copyTextureToBuffer(gpuTexture, gpuBuffer, 0, 0);
+                RenderSystem.queueFencedTask(() -> {
                     try (GpuBufferSlice.MappedView mappedView = gpuBuffer.map(true, false)) {
                         NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
 
@@ -272,7 +273,7 @@ public class RenderableDispatcher {
                     } finally {
                         gpuBuffer.close();
                     }
-                }, 0);
+                });
             } catch (Throwable throwable) {
                 gpuBuffer.close();
                 future.completeExceptionally(throwable);

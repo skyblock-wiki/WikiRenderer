@@ -148,7 +148,7 @@ public class VanillaWidgetComponent extends BaseUIComponent {
 
     @Override
     public boolean shouldDrawTooltip(double mouseX, double mouseY) {
-        return this.widget.visible && this.widget.active && super.shouldDrawTooltip(mouseX, mouseY);
+        return this.widget.isVisible() && this.widget.active && super.shouldDrawTooltip(mouseX, mouseY);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.pigicial.wikirenderer.screen.owo.util;
 
 import com.google.gson.*;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.screen.owo.core.Color;
 import com.pigicial.wikirenderer.screen.owo.core.OwoUIGraphics;

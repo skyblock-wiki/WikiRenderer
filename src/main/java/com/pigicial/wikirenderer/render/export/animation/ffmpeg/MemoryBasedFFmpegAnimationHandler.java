@@ -28,7 +28,7 @@ public class MemoryBasedFFmpegAnimationHandler extends FFmpegAnimationHandler {
         if (this.closed || this.remainingAnimationFrames <= 0) return;
 
         if (GlobalProperties.get().syncTextureAnimationsToAnimation.get()) {
-            Minecraft.getInstance().getTextureManager().tick();
+            Minecraft.getInstance().getAtlasManager().tick();
         }
 
         GpuTexture texture = RenderableDispatcher.drawIntoTexture(this.screen, this.renderable, effectiveTickDelta, screen.getTimeSinceCreationMs(), renderable.getExportResolution());

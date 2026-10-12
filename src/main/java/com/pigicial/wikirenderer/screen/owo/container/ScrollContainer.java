@@ -72,7 +72,7 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
         super.layout(space);
 
         this.maxScroll = Math.max(0, this.direction.sizeGetter.apply(child) - (this.direction.sizeGetter.apply(this) - this.direction.insetGetter.apply(this.padding.get())));
-        this.scrollOffset = Mth.clamp(this.scrollOffset, 0, this.maxScroll + .5);
+        this.scrollOffset = Math.clamp(this.scrollOffset, 0, this.maxScroll + .5);
         this.childSize = this.direction.sizeGetter.apply(this.child);
         this.lastScrollPosition = -1;
     }
@@ -251,7 +251,7 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
     }
 
     protected void scrollBy(double offset, boolean instant, boolean showScrollbar) {
-        this.scrollOffset = Mth.clamp(this.scrollOffset + offset, 0, this.maxScroll + .5);
+        this.scrollOffset = Math.clamp(this.scrollOffset + offset, 0, this.maxScroll + .5);
         if (instant) this.currentScrollPosition = this.scrollOffset;
         if (showScrollbar) this.lastScrollbarInteractTime = System.currentTimeMillis() + 1250;
     }
@@ -265,9 +265,9 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
      */
     public ScrollContainer<C> scrollTo(UIComponent component) {
         if (this.direction == ScrollDirection.VERTICAL) {
-            this.scrollOffset = Mth.clamp(this.scrollOffset - (this.y - component.y() + component.margins().get().top()), 0, this.maxScroll);
+            this.scrollOffset = Math.clamp(this.scrollOffset - (this.y - component.y() + component.margins().get().top()), 0, this.maxScroll);
         } else {
-            this.scrollOffset = Mth.clamp(this.scrollOffset - (this.x - component.x() + component.margins().get().right()), 0, this.maxScroll);
+            this.scrollOffset = Math.clamp(this.scrollOffset - (this.x - component.x() + component.margins().get().right()), 0, this.maxScroll);
         }
         return this;
     }
@@ -360,7 +360,7 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
             return (context, x, y, width, height, trackX, trackY, trackWidth, trackHeight, lastInteractTime, direction, active) -> {
                 if (!active) return;
 
-                final var progress = Easing.SINE.apply(Mth.clamp(lastInteractTime - System.currentTimeMillis(), 0, 750) / 750f);
+                final var progress = Easing.SINE.apply(Math.clamp(lastInteractTime - System.currentTimeMillis(), 0, 750) / 750f);
                 int alpha = (int) (progress * (scrollbarColor >>> 24));
 
                 context.fill(

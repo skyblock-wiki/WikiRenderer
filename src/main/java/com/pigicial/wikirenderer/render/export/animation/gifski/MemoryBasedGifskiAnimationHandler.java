@@ -30,7 +30,7 @@ public class MemoryBasedGifskiAnimationHandler extends AnimationHandler {
         if (this.closed || this.remainingAnimationFrames <= 0) return;
 
         if (GlobalProperties.get().syncTextureAnimationsToAnimation.get()) {
-            Minecraft.getInstance().getTextureManager().tick();
+            Minecraft.getInstance().getAtlasManager().tick();
         }
 
         WikiRenderer.skipWorldRender = true;

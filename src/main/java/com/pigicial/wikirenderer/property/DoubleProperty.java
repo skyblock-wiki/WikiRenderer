@@ -1,7 +1,5 @@
 package com.pigicial.wikirenderer.property;
 
-import net.minecraft.util.Mth;
-
 public class DoubleProperty extends NumberProperty<Double> {
 
     private DoubleProperty(double defaultValue, double min, double max) {
@@ -48,7 +46,7 @@ public class DoubleProperty extends NumberProperty<Double> {
             if (this.value > this.max) this.value -= this.span;
             if (this.value < this.min) this.value += this.span;
         } else {
-            this.value = Mth.clamp(this.value + by, this.min, this.max);
+            this.value = Math.clamp(this.value + by, this.min, this.max);
         }
 
         this.invokeListeners();
