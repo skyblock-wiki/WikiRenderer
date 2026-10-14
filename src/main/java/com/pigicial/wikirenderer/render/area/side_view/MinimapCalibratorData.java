@@ -1,6 +1,7 @@
 package com.pigicial.wikirenderer.render.area.side_view;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.pigicial.wikirenderer.render.area.AreaPropertyBundle;
 import com.pigicial.wikirenderer.render.area.AreaRenderable;
 import com.pigicial.wikirenderer.render.export.CropData;
@@ -71,7 +72,8 @@ public record MinimapCalibratorData(
         int ySize = (int) boundingBox.getYsize();
         int zSize = (int) boundingBox.getZsize();
 
-        Matrix4f projection = new Matrix4f().setOrtho(-1, 1, -1, 1, -100, 1000);
+        boolean zZeroToOne = RenderSystem.getDevice().getDeviceInfo().isZZeroToOne();
+        Matrix4f projection = new Matrix4f().setOrtho(-1, 1, 1, -1, -1000, 10, zZeroToOne);
 
         Matrix4fStack modelView = new Matrix4fStack(2);
         renderable.getProperties().applyToViewMatrix(renderable, modelView);
