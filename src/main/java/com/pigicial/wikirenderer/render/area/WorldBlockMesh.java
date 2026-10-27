@@ -111,7 +111,7 @@ public class WorldBlockMesh {
         return !currentlyFullyBuilding;
     }
 
-    public ChunkSectionsToRender getBlocksToRender(PoseStack matrices) {
+    public AreaTerrainDraws getBlocksToRender(PoseStack matrices) {
         if (!this.getMeshState().canRender) {
             throw new IllegalStateException("World mesh not prepared!");
         }
@@ -141,7 +141,7 @@ public class WorldBlockMesh {
             }
         }
 
-        ChunkSectionsToRender sections;
+        AreaTerrainDraws sections;
         if (Minecraft.getInstance().levelRenderer.isChunkRenderingUsingMultiDrawIndirect()) {
             sections = this.prepareChunkRendersIndirect(matrices.last().pose(), !Minecraft.getInstance().gameRenderer.useImprovedTransparency());
         } else {
@@ -151,7 +151,7 @@ public class WorldBlockMesh {
         return sections;
     }
 
-    public void drawItAll(@Nullable ChunkSectionsToRender blocksToRender) {
+    public void drawItAll(@Nullable AreaTerrainDraws blocksToRender) {
         RenderTarget mainTarget = WikiRenderer.mainTargetOverride == null ? Minecraft.getInstance().gameRenderer.mainRenderTarget() : WikiRenderer.mainTargetOverride;
 
         // based on LevelRenderer#addMainPass
@@ -165,14 +165,14 @@ public class WorldBlockMesh {
 
                 GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
                 if (blocksToRender != null) {
-                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, false);
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas);
                 }
 
                 frame.executeSolid(renderPass);
 
                 frame.executeTranslucent(renderPass); // this requires non-OIT, which is why there's WikiRenderer.NODE_STORAGE (defaults to non-oit)
                 if (blocksToRender != null) {
-                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, false);
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas);
                 }
                 frame.executeTranslucentAfterTerrain(renderPass);
             }
@@ -292,7 +292,7 @@ public class WorldBlockMesh {
         return largestIndexCount;
     }
 
-    public ChunkSectionsToRender prepareChunkRenders(final Matrix4fc modelViewMatrix, final boolean respectTranslucentOrder) {
+    public AreaTerrainDraws prepareChunkRenders(final Matrix4fc modelViewMatrix, final boolean respectTranslucentOrder) {
         Map<ChunkSectionLayer, List<ChunkDrawGroup>> drawGroups = Util.makeEnumMap(ChunkSectionLayer.class, _ -> new ReferenceArrayList<>());
         List<DynamicGpuData.ChunkSectionInfo> sectionInfos = new ArrayList<>();
 
@@ -342,10 +342,10 @@ public class WorldBlockMesh {
             autoIndices.requestIndexCount(largestIndexCount);
         }
 
-        return new ChunkSectionsToRender.DrawSeparate(terrainTransformUbo, flattenDraws, largestIndexCount, chunkSectionInfos);
+        return new AreaTerrainDraws.DrawSeparate(terrainTransformUbo, flattenDraws, largestIndexCount, chunkSectionInfos);
     }
 
-    public ChunkSectionsToRender prepareChunkRendersIndirect(final Matrix4fc modelViewMatrix, final boolean respectTranslucentOrder) {
+    public AreaTerrainDraws prepareChunkRendersIndirect(final Matrix4fc modelViewMatrix, final boolean respectTranslucentOrder) {
         EnumMap<ChunkSectionLayer, List<ChunkDrawGroup>> drawGroups = new EnumMap<>(ChunkSectionLayer.class);
 
         for (ChunkSectionLayer layer : ChunkSectionLayer.values()) {
@@ -406,7 +406,7 @@ public class WorldBlockMesh {
             autoIndices.requestIndexCount(largestIndexCount);
         }
 
-        return new ChunkSectionsToRender.DrawIndirect(terrainTransformUbo, indirectDraws, largestIndexCount, chunkSectionInfos);
+        return new AreaTerrainDraws.DrawIndirect(terrainTransformUbo, indirectDraws, largestIndexCount, chunkSectionInfos);
     }
 
     public void submitBlockEntities(PoseStack standardStack, SubmitNodeStorage nodeStorage, CameraRenderState cameraRenderState, float tickDelta) {
