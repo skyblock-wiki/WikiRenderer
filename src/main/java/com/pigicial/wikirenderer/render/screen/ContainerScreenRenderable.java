@@ -129,7 +129,6 @@ public class ContainerScreenRenderable extends DefaultRenderable<ContainerScreen
         containerScreen.init(guiScaledWidth, guiScaledHeight);
         containerScreen.resize(guiScaledWidth, guiScaledHeight);
 
-        // todo: fix custom mouse not being used here (mixin) // , mouseX, mouseY, tickDelta
         containerScreen.extractRenderStateWithTooltipAndSubtitles(guiGraphics);
         guiRenderer.render();
         guiRenderer.endFrame();
