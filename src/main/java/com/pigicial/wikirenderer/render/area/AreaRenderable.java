@@ -210,7 +210,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
             PoseStack meshStack = new PoseStack();
             meshStack.mulPose(modelViewStack);
             meshStack.translate(-xSize / 2f, -ySize / 2f, -zSize / 2f);
-            meshStack.translate(-minCorner.getX(), -minCorner.getY(), -minCorner.getZ());
+            //meshStack.translate(-minCorner.getX(), -minCorner.getY(), -minCorner.getZ());
 
             blocksToRender = this.mesh.getBlocksToRender(meshStack);
         }

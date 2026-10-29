@@ -64,4 +64,14 @@ public class EntityVertexBounds {
                && y >= box.minY && y <= box.maxY
                && z >= box.minZ && z <= box.maxZ;
     }
+
+    public void move(double xOffset, double yOffset, double zOffset) {
+        if (bounds != null) {
+            bounds = bounds.move(xOffset, yOffset, zOffset);
+        }
+        for (int i = 0, textBoundsSize = textBounds.size(); i < textBoundsSize; i++) {
+            AABB textBound = textBounds.get(i);
+            textBounds.set(i, textBound.move(xOffset, yOffset, zOffset));
+        }
+    }
 }

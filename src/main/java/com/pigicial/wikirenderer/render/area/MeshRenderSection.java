@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,6 +61,11 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
 
     public BlockPos getFrom() {
         return new BlockPos(sectionToBlockCoordinate(sectionX), sectionToBlockCoordinate(sectionY), sectionToBlockCoordinate(sectionZ));
+    }
+
+    @Override
+    public @NonNull BlockPos getRenderOrigin() {
+        return this.getFrom();
     }
 
     public BlockPos getTo() {
@@ -115,8 +121,11 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
                 if (!fluidState.isEmpty()) {
 
                     poseStack.pushPose();
-                    poseStack.translate(-(pos.getX() & 15), -(pos.getY() & 15), -(pos.getZ() & 15));
-                    poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
+                    poseStack.translate(
+                            sectionRelative(pos.getX()) - (pos.getX() & 15),
+                            sectionRelative(pos.getY()) - (pos.getY() & 15),
+                            sectionRelative(pos.getZ()) - (pos.getZ() & 15)
+                    );
                     //FluidVertexConsumer is used because insert pos into tesselarate will break what it thinks the water looks like (height/adjacent blocks and whatnot)
                     FluidRenderer.Output fluidOutput = l -> new FluidVertexConsumer(mesh.getOrBeginLayer(startedLayers, builders, l), poseStack.last().pose(), poseStack.last().normal());
                     fluidRenderer.tesselate(mesh.world, pos, fluidOutput, blockState, fluidState);
@@ -129,7 +138,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
                     AnimationTimingUtil.scanTicksToFullyAnimateBlock(model, animationCompletionTimings, randomSeed);
 
                     BlockQuadOutput output = ModelBlockRenderer.forceOpaque(cutoutLeaves, blockState) ? opaqueQuadOutput : quadOutput;
-                    blockRenderer.tesselateBlock(output, pos.getX(), pos.getY(), pos.getZ(), mesh.world, pos, blockState, model, randomSeed);
+                    blockRenderer.tesselateBlock(output, sectionRelative(pos.getX()), sectionRelative(pos.getY()), sectionRelative(pos.getZ()), mesh.world, pos, blockState, model, randomSeed);
                 }
             }
         }
@@ -269,5 +278,9 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
 
     public static int sectionToBlockCoordinate(int sectionCoordinate) {
         return sectionCoordinate << 5;
+    }
+
+    public static int sectionRelative(int blockCoord) {
+        return blockCoord & 31;
     }
 }

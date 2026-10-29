@@ -55,9 +55,13 @@ public class EntityRenderBoundsUtil {
         try {
             WikiRenderer.inBoundsCalculation = true;
             SubmitNodeStorage tempStorage = new SubmitNodeStorage();
-            Minecraft.getInstance().getEntityRenderDispatcher().submit(renderState, cameraRenderState, xOffset, yOffset, zOffset, new PoseStack(), tempStorage);
+            Minecraft.getInstance().getEntityRenderDispatcher().submit(renderState, cameraRenderState, 0, 0, 0, new PoseStack(), tempStorage);
 
-            return submitVertexData(tempStorage);
+            EntityVertexBounds vertexBounds = submitVertexData(tempStorage);
+            if (vertexBounds != null) {
+                vertexBounds.move(xOffset, yOffset, zOffset);
+            }
+            return vertexBounds;
         } finally {
             WikiRenderer.inBoundsCalculation = false;
         }
