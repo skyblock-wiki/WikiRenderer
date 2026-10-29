@@ -37,7 +37,6 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GlobalSettingsUniform;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -205,7 +204,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
             this.submitEntities(cameraRenderState, tickDelta, standardStack, nodeStorage);
         }
 
-        ChunkSectionsToRender blocksToRender = null;
+        AreaTerrainDraws blocksToRender = null;
         if (!properties.hideMesh.get()) {
             PoseStack meshStack = new PoseStack();
             meshStack.mulPose(modelViewStack);
