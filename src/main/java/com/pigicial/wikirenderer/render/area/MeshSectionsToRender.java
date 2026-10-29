@@ -27,11 +27,11 @@ import java.util.Map;
 // Based on ChunkSectionsToRender, but drawn by us so that clients hooking ChunkSectionsToRender#renderGroup for world terrain
 // (Lunar Client swaps in a Sodium-only pipeline there, which fails to compile against vanilla core/terrain) don't touch the area mesh
 @Environment(EnvType.CLIENT)
-public abstract class AreaTerrainDraws {
+public abstract class MeshSectionsToRender {
     private final GpuBufferSlice terrainTransformUbo;
     private final int maxIndicesRequired;
 
-    private AreaTerrainDraws(GpuBufferSlice terrainTransformUbo, int maxIndicesRequired) {
+    private MeshSectionsToRender(GpuBufferSlice terrainTransformUbo, int maxIndicesRequired) {
         this.terrainTransformUbo = terrainTransformUbo;
         this.maxIndicesRequired = maxIndicesRequired;
     }
@@ -75,7 +75,7 @@ public abstract class AreaTerrainDraws {
 
     // Based on ChunkSectionsToRender.DrawIndirect
     @Environment(EnvType.CLIENT)
-    public static final class DrawIndirect extends AreaTerrainDraws {
+    public static final class DrawIndirect extends MeshSectionsToRender {
         private final EnumMap<ChunkSectionLayer, List<ChunkSectionsToRender.GpuMultiDrawIndexedIndirect>> drawGroupsPerLayer;
         private final GpuBufferSlice chunkSectionInfos;
 
@@ -117,7 +117,7 @@ public abstract class AreaTerrainDraws {
 
     // Based on ChunkSectionsToRender.DrawSeparate
     @Environment(EnvType.CLIENT)
-    public static final class DrawSeparate extends AreaTerrainDraws {
+    public static final class DrawSeparate extends MeshSectionsToRender {
         private final Map<ChunkSectionLayer, List<RenderPass.Draw<GpuBufferSlice[]>>> drawsPerLayer;
         private final GpuBufferSlice[] chunkSectionInfos;
 

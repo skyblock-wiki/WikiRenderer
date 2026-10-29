@@ -204,7 +204,7 @@ public class AreaRenderable extends DefaultRenderable<AreaPropertyBundle> implem
             this.submitEntities(cameraRenderState, tickDelta, standardStack, nodeStorage);
         }
 
-        AreaTerrainDraws blocksToRender = null;
+        MeshSectionsToRender blocksToRender = null;
         if (!properties.hideMesh.get()) {
             PoseStack meshStack = new PoseStack();
             meshStack.mulPose(modelViewStack);
