@@ -38,15 +38,23 @@ public class ItemModelsProcessor {
                 ItemModel fallback = ((SelectItemModelAccessor) selectItemModel).wikirenderer$getFallback();
                 Object2ObjectMap<?, ItemModel> bakedModels = ((SelectItemModelAccessor) selectItemModel).wikirenderer$getBakedModels();
 
-                modelsToFlatten.add(fallback);
-                modelsToFlatten.addAll(bakedModels.values());
+                if (fallback != null) {
+                    modelsToFlatten.add(fallback);
+                }
+                if (bakedModels != null) {
+                    modelsToFlatten.addAll(bakedModels.values());
+                }
             }
             case RangeSelectItemModel rangeSelectItemModel -> {
                 ItemModel fallback = ((RangeSelectItemModelAccessor) rangeSelectItemModel).wikirenderer$getFallback();
                 ItemModel[] itemModels = ((RangeSelectItemModelAccessor) rangeSelectItemModel).wikirenderer$getModels();
 
-                modelsToFlatten.add(fallback);
-                modelsToFlatten.addAll(Arrays.asList(itemModels));
+                if (fallback != null) {
+                    modelsToFlatten.add(fallback);
+                }
+                if (itemModels != null) {
+                    modelsToFlatten.addAll(Arrays.asList(itemModels));
+                }
             }
             case ConditionalItemModel conditionalItemModel -> {
                 ItemModel onFalseModel = ((ConditionalItemModelAccessor) conditionalItemModel).wikirenderer$getOnFalse();
