@@ -53,6 +53,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.render.TextureSetup;
@@ -61,7 +62,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -594,9 +595,9 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float tickDelta) {
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
+    public void extractRenderState(GuiGraphicsExtractor graphics) {
+        this.mouseX = graphics.mouseX();
+        this.mouseY = graphics.mouseY();
         if (this.guiRebuildScheduled) {
             this.saveScrollOffsetDataIfPossible();
             this.uiAdapter = null;
@@ -607,7 +608,7 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
             this.guiRebuildScheduled = false;
         }
         // smoother, idk why but the provided tickDelta is bad
-        tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
 
         Window window = minecraft.getWindow();
@@ -627,7 +628,7 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
         int placementXEnd = renderable.renderPreviewToEntireScreenWidth() ? window.getGuiScaledWidth() : window.getGuiScaledWidth() - (width - (viewportEndX));
 
         graphics.guiRenderState.addBlitToCurrentLayer(new BlitRenderState(
-                RenderPipelines.GUI_TEXTURED,
+                GuiPipeline.TEXTURED,
                 TextureSetup.singleTexture(Objects.requireNonNull(renderedOutput.getColorTextureView()), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)),
                 new Matrix3x2f(graphics.pose()),
                 placementX,
@@ -659,7 +660,7 @@ public class RenderScreen extends BaseOwoScreen<FlowLayout> {
                 this.exportAnimationButton.tooltip(tooltip);
             }
 
-            super.extractRenderState(graphics, mouseX, mouseY, tickDelta);
+            super.extractRenderState(graphics);
 
             if (FileIO.taskCount() > 0) {
                 if (!this.ioStateComponent.hasParent()) {

@@ -29,7 +29,7 @@
     "optifabric": "*"
   },
   "depends": {
-    "fabricloader": ">=0.19.5",
+    "fabricloader": ">=0.20.0",
     "minecraft": ">=26.3",
     "fabric-api": "*"
   },

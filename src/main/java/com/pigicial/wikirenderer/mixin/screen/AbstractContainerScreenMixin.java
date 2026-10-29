@@ -21,7 +21,7 @@ public class AbstractContainerScreenMixin {
     }
 
     @Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
-    private void wikirenderer$skipSlots(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+    private void wikirenderer$skipSlots(GuiGraphicsExtractor graphics, Slot slot, CallbackInfo ci) {
         if (WikiRenderer.inContainerScreenDraw && ContainerScreenPropertyBundle.INSTANCE.hideItems.get()) {
             ci.cancel();
         }
@@ -35,7 +35,7 @@ public class AbstractContainerScreenMixin {
     }
 
     @Inject(method = "extractTooltip", at = @At("HEAD"), cancellable = true)
-    private void wikirenderer$skipTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
+    private void wikirenderer$skipTooltip(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (WikiRenderer.inContainerScreenDraw && ContainerScreenPropertyBundle.INSTANCE.hideItems.get()) {
             ci.cancel();
         }

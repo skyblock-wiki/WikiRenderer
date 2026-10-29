@@ -3,7 +3,8 @@ package com.pigicial.wikirenderer.screen.components;
 import com.pigicial.wikirenderer.screen.owo.component.DropdownComponent;
 import com.pigicial.wikirenderer.screen.owo.core.*;
 import com.pigicial.wikirenderer.util.Translate;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -108,7 +109,7 @@ public class SearchableEntityListComponent extends DropdownComponent {
             int u = state ? 16 : 0;
             int iconY = this.y + (this.height - 9) / 2;
 
-            graphics.blit(RenderPipelines.GUI_TEXTURED, ICONS_TEXTURE,
+            graphics.blit(GuiPipeline.TEXTURED, ICONS_TEXTURE,
                     this.x + 2, iconY,
                     u, 0,
                     9, 9,

@@ -102,7 +102,7 @@ public class WikiRenderer implements ClientModInitializer {
         Identifier hudId = Identifier.fromNamespaceAndPath(MOD_ID, "hud");
         Hud.add(hudId, () -> UIContainers.verticalFlow(Sizing.content(), Sizing.content()).positioning(Positioning.absolute(20, 20)));
 
-        HudElementRegistry.addLast(hudId, (_, _) -> {
+        HudElementRegistry.addLast(hudId, (_) -> {
             Minecraft client = Minecraft.getInstance();
             FlowLayout isometricHud = (FlowLayout) Hud.getComponent(hudId);
             if (isometricHud == null) return;

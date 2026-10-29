@@ -8,8 +8,9 @@ import com.pigicial.wikirenderer.screen.owo.container.UIContainers;
 import com.pigicial.wikirenderer.screen.owo.core.*;
 import com.pigicial.wikirenderer.screen.owo.util.UISounds;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -110,7 +111,7 @@ public class DropdownComponent extends FlowLayout {
     }
 
     protected static void drawIconFromTexture(OwoUIGraphics context, ParentUIComponent dropdown, int y, int u, int v) {
-        context.blit(RenderPipelines.GUI_TEXTURED, ICONS_TEXTURE,
+        context.blit(GuiPipeline.TEXTURED, ICONS_TEXTURE,
                 dropdown.x() + dropdown.width() - dropdown.padding().get().right() - 10, y,
                 u, v,
                 9, 9,

@@ -163,7 +163,11 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    public void extractRenderState(GuiGraphicsExtractor graphics) {
+        this.extractRenderState(graphics, graphics.mouseX(), graphics.mouseY());
+    }
+
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!(graphics instanceof OwoUIGraphics)) graphics = OwoUIGraphics.of(graphics);
         var owoGraphics = (OwoUIGraphics) graphics;
 
@@ -173,10 +177,12 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
             final var delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
             final var window = Minecraft.getInstance().getWindow();
 
+            float tickDelta = graphics.partialTicks();
+
             this.rootComponent.update(delta, mouseX, mouseY);
 
             graphics.enableScissor(0, 0, window.getWidth(), window.getHeight());
-            this.rootComponent.draw(owoGraphics, mouseX, mouseY, a, delta);
+            this.rootComponent.draw(owoGraphics, mouseX, mouseY, tickDelta, delta);
             graphics.disableScissor();
 
             final var hovered = this.rootComponent.childAt(mouseX, mouseY);
@@ -194,9 +200,9 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
     /**
      * Draw the current tooltip of the UI managed by this adapter. This method
-     * must not be called without a previous, corresponding call to {@link #render(GuiGraphics, int, int, float)}
+     * must not be called without a previous, corresponding call to {@link #extractRenderState(GuiGraphicsExtractor)} (maybe? idk this used to be different)
      *
-     * @since 0.12.19
+     * @since 0.12.19nk #render(GuiGraphicsExtractor)}
      */
     public void drawTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         if (!(graphics instanceof OwoUIGraphics)) graphics = OwoUIGraphics.of(graphics);
@@ -205,7 +211,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
         final var delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
 
         this.rootComponent.drawTooltip(owoContext, mouseX, mouseY, partialTicks, delta);
-        graphics.extractDeferredElements(mouseX, mouseY, partialTicks);
+        graphics.extractDeferredElements();
     }
 
     @Override

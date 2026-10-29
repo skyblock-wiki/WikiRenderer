@@ -11,6 +11,7 @@ import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.IndexType;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPassLayout;
 import com.mojang.renderpearl.api.textures.AddressMode;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.mojang.renderpearl.api.textures.GpuSampler;
@@ -30,6 +31,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.TextureFilteringMethod;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DynamicGpuData;
+import net.minecraft.client.renderer.RenderPassLayouts;
 import net.minecraft.client.renderer.SectionBufferBuilderPack;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.block.BlockModelLighter;
@@ -160,7 +162,7 @@ public class WorldBlockMesh {
         try (FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(submitNodeStorage)) {
             try (RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
-                    .createRenderPass(() -> "Mesh Main", mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
+                    .createRenderPass(() -> "Mesh Main", RenderPassLayouts.COLOR_DEPTH, mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
                 RenderSystem.bindDefaultUniforms(renderPass);
 
                 GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).textureView();
@@ -178,9 +180,9 @@ public class WorldBlockMesh {
             }
 
             if (frame.hasAnySeeThrough()) {
-                RenderPassDescriptor descriptor = RenderPassDescriptor.builder(() -> "Mesh see through features").withColorAttachment(mainTarget.getColorTextureView()).build();
-
-                try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(descriptor)) {
+                try (RenderPass renderPass = RenderSystem.getDevice()
+                        .createCommandEncoder()
+                        .createRenderPass(() -> "Mesh See through features", RenderPassLayouts.COLOR_ONLY, mainTarget.getColorTextureView())) {
                     RenderSystem.bindDefaultUniforms(renderPass);
                     frame.executeSeeThrough(renderPass);
                 }
@@ -241,7 +243,7 @@ public class WorldBlockMesh {
                             }
 
                             int combinedHash = 173;
-                            VertexFormat vertexFormat = layer.pipeline(false, false).getVertexFormatBinding(0);
+                            VertexFormat vertexFormat = layer.pipeline(false, false, false, null).getVertexFormatBinding(0);
                             GpuBuffer vertexBuffer = slice.vertexBuffer();
                             combinedHash = 31 * combinedHash + vertexBuffer.hashCode();
                             int firstIndex = 0;

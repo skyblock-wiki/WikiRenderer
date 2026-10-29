@@ -3,6 +3,7 @@ package com.pigicial.wikirenderer.screen.owo.renderstate;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.pigicial.wikirenderer.screen.owo.core.Color;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 public record GradientQuadElementRenderState(
-    RenderPipeline pipeline,
+    GuiPipeline pipeline,
     Matrix3x2f pose,
     ScreenRectangle bounds,
     ScreenRectangle scissorArea,
@@ -29,7 +30,7 @@ public record GradientQuadElementRenderState(
     }
 
     @Override
-    public RenderPipeline pipeline() {
+    public GuiPipeline pipeline() {
         return this.pipeline;
     }
 

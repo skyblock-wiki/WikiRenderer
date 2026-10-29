@@ -9,9 +9,10 @@ import com.pigicial.wikirenderer.screen.owo.core.Sizing;
 import com.pigicial.wikirenderer.screen.owo.util.NinePatchTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -32,8 +33,8 @@ public class ButtonComponent extends Button {
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        this.renderer.draw((OwoUIGraphics) graphics, this, a);
+    protected void extractContents(GuiGraphicsExtractor graphics) {
+        this.renderer.draw((OwoUIGraphics) graphics, this, graphics.partialTicks());
 
         var textRenderer = Minecraft.getInstance().font;
         int color = this.active ? 0xffffffff : 0xffa0a0a0;
@@ -46,7 +47,7 @@ public class ButtonComponent extends Button {
 
         var tooltip = ((AbstractWidgetAccessor) this).owo$getTooltip();
         if (this.isHovered && tooltip.get() != null) {
-            graphics.setTooltipForNextFrame(textRenderer, tooltip.get().toCharSequence(Minecraft.getInstance()), DefaultTooltipPositioner.INSTANCE, mouseX, mouseY, false);
+            graphics.setTooltipForNextFrame(textRenderer, tooltip.get().toCharSequence(Minecraft.getInstance()), DefaultTooltipPositioner.INSTANCE, graphics.mouseX(), graphics.mouseY(), false);
         }
     }
 
@@ -118,7 +119,7 @@ public class ButtonComponent extends Button {
                     renderV += button.height;
                 }
 
-                context.blit(RenderPipelines.GUI_TEXTURED, texture, button.getX(), button.getY(), u, renderV, button.width, button.height, textureWidth, textureHeight);
+                context.blit(GuiPipeline.DEFAULT, texture, button.getX(), button.getY(), u, renderV, button.width, button.height, textureWidth, textureHeight);
             };
         }
 

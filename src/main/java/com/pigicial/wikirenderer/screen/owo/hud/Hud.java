@@ -5,6 +5,7 @@ import com.pigicial.wikirenderer.screen.owo.core.OwoUIAdapter;
 import com.pigicial.wikirenderer.screen.owo.core.UIComponent;
 import com.pigicial.wikirenderer.screen.owo.event.ClientRenderCallback;
 import com.pigicial.wikirenderer.screen.owo.event.WindowResizeCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -106,9 +107,9 @@ public class Hud {
             }
         });
 
-        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("owo", "owo_ui_hud"), (context, tickCounter) -> {
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("owo", "owo_ui_hud"), (context) -> {
             if (adapter == null || suppress || Minecraft.getInstance().gui.hud.isHidden()) return;
-            adapter.extractRenderState(context, -69, -69, tickCounter.getGameTimeDeltaPartialTick(false));
+            adapter.extractRenderState(context, -69, -69);
         });
     }
 }

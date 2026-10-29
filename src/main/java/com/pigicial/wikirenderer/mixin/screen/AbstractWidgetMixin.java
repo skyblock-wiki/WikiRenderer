@@ -297,8 +297,8 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
         return CursorStyle.POINTER;
     }
 
-    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;extractWidgetRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"))
-    private void setHovered(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;extractWidgetRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"))
+    private void setHovered(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (this.wrapper != null) this.isHovered = this.isHovered && this.wrapper.hovered();
     }
 }

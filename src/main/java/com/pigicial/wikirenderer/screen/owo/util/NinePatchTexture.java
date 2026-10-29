@@ -1,13 +1,12 @@
 package com.pigicial.wikirenderer.screen.owo.util;
 
 import com.google.gson.*;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.pigicial.wikirenderer.WikiRenderer;
 import com.pigicial.wikirenderer.screen.owo.core.Color;
 import com.pigicial.wikirenderer.screen.owo.core.OwoUIGraphics;
 import com.pigicial.wikirenderer.screen.owo.core.PositionedRectangle;
 import com.pigicial.wikirenderer.screen.owo.core.Size;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -88,14 +87,14 @@ public class NinePatchTexture {
     }
 
     public void draw(OwoUIGraphics context, int x, int y, int width, int height, Color color) {
-        this.draw(context, RenderPipelines.GUI_TEXTURED, x, y, width, height, color);
+        this.draw(context, GuiPipeline.TEXTURED, x, y, width, height, color);
     }
 
-    public void draw(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height) {
+    public void draw(OwoUIGraphics context, GuiPipeline pipeline, int x, int y, int width, int height) {
         this.draw(context, pipeline, x, y, width, height, Color.WHITE);
     }
 
-    public void draw(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
+    public void draw(OwoUIGraphics context, GuiPipeline pipeline, int x, int y, int width, int height, Color color) {
         int rightEdge = this.cornerPatchSize().width() + this.centerPatchSize().width();
         int bottomEdge = this.cornerPatchSize().height() + this.centerPatchSize().height();
 
@@ -111,7 +110,7 @@ public class NinePatchTexture {
         }
     }
 
-    protected void drawStretched(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
+    protected void drawStretched(OwoUIGraphics context, GuiPipeline pipeline, int x, int y, int width, int height, Color color) {
         int doubleCornerHeight = this.cornerPatchSize().height() * 2;
         int doubleCornerWidth = this.cornerPatchSize().width() * 2;
 
@@ -153,7 +152,7 @@ public class NinePatchTexture {
         }
     }
 
-    protected void drawRepeated(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
+    protected void drawRepeated(OwoUIGraphics context, GuiPipeline pipeline, int x, int y, int width, int height, Color color) {
         int doubleCornerHeight = this.cornerPatchSize().height() * 2;
         int doubleCornerWidth = this.cornerPatchSize().width() * 2;
 
@@ -222,18 +221,18 @@ public class NinePatchTexture {
     }
 
     public static void draw(Identifier texture, OwoUIGraphics context, int x, int y, int width, int height) {
-        draw(texture, context, RenderPipelines.GUI_TEXTURED, x, y, width, height);
+        draw(texture, context, GuiPipeline.TEXTURED, x, y, width, height);
     }
 
     public static void draw(Identifier texture, OwoUIGraphics context, int x, int y, int width, int height, Color color) {
-        draw(texture, context, RenderPipelines.GUI_TEXTURED, x, y, width, height, color);
+        draw(texture, context, GuiPipeline.TEXTURED, x, y, width, height, color);
     }
 
-    public static void draw(Identifier texture, OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height) {
+    public static void draw(Identifier texture, OwoUIGraphics context, GuiPipeline pipeline, int x, int y, int width, int height) {
         ifPresent(texture, ninePatchTexture -> ninePatchTexture.draw(context, pipeline, x, y, width, height));
     }
 
-    public static void draw(Identifier texture, OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
+    public static void draw(Identifier texture, OwoUIGraphics context, GuiPipeline pipeline, int x, int y, int width, int height, Color color) {
         ifPresent(texture, ninePatchTexture -> ninePatchTexture.draw(context, pipeline, x, y, width, height, color));
     }
 

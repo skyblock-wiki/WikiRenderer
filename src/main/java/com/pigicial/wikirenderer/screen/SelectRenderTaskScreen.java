@@ -113,8 +113,8 @@ public class SelectRenderTaskScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractRenderState(graphics, mouseX, mouseY, a);
+    public void extractRenderState(GuiGraphicsExtractor graphics) {
+        super.extractRenderState(graphics);
         if (lastHeadItemsState != this.isUsingOnlyHeadItems()) {
             lastHeadItemsState = !lastHeadItemsState;
             this.uiAdapter = null;

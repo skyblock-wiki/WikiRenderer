@@ -9,12 +9,13 @@ import com.pigicial.wikirenderer.screen.owo.util.NinePatchTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -109,7 +110,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
     }
 
     public void drawRectOutline(int x, int y, int width, int height, int color) {
-        drawRectOutline(RenderPipelines.GUI, x, y, width, height, color);
+        drawRectOutline(GuiPipeline.DEFAULT, x, y, width, height, color);
     }
 
     /**
@@ -121,7 +122,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
      * @param height The height of the rectangle
      * @param color  The color of the rectangle
      */
-    public void drawRectOutline(RenderPipeline pipeline, int x, int y, int width, int height, int color) {
+    public void drawRectOutline(GuiPipeline pipeline, int x, int y, int width, int height, int color) {
         this.fill(pipeline, x, y, x + width, y + 1, color);
         this.fill(pipeline, x, y + height - 1, x + width, y + height, color);
 
@@ -130,7 +131,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
     }
 
     public void drawGradientRect(int x, int y, int width, int height, int topLeftColor, int topRightColor, int bottomRightColor, int bottomLeftColor) {
-        this.drawGradientRect(RenderPipelines.GUI, x, y, width, height, topLeftColor, topRightColor, bottomRightColor, bottomLeftColor);
+        this.drawGradientRect(GuiPipeline.DEFAULT, x, y, width, height, topLeftColor, topRightColor, bottomRightColor, bottomLeftColor);
     }
 
     /**
@@ -145,7 +146,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
      * @param bottomRightColor The color at the rectangle's bottom right corner
      * @param bottomLeftColor  The color at the rectangle's bottom left corner
      */
-    public void drawGradientRect(RenderPipeline pipeline, int x, int y, int width, int height, int topLeftColor, int topRightColor, int bottomRightColor, int bottomLeftColor) {
+    public void drawGradientRect(GuiPipeline pipeline, int x, int y, int width, int height, int topLeftColor, int topRightColor, int bottomRightColor, int bottomLeftColor) {
         this.guiRenderState.addGuiElement(new GradientQuadElementRenderState(
             pipeline,
             new Matrix3x2f(this.pose()),
@@ -211,7 +212,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
     // --- debug rendering ---
 
     public static void drawInsets(OwoUIGraphics self, int x, int y, int width, int height, Insets insets, int color) {
-        drawInsets(self, RenderPipelines.GUI, x, y, width, height, insets, color);
+        drawInsets(self, GuiPipeline.DEFAULT, x, y, width, height, insets, color);
     }
 
     /**
@@ -225,7 +226,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
      * @param insets The insets to draw around the rectangle
      * @param color  The color to draw the inset area with
      */
-    public static void drawInsets(OwoUIGraphics self, RenderPipeline pipeline, int x, int y, int width, int height, Insets insets, int color) {
+    public static void drawInsets(OwoUIGraphics self, GuiPipeline pipeline, int x, int y, int width, int height, Insets insets, int color) {
         self.fill(pipeline, x - insets.left(), y - insets.top(), x + width + insets.right(), y, color);
         self.fill(pipeline, x - insets.left(), y + height, x + width + insets.right(), y + height + insets.bottom(), color);
 
@@ -253,7 +254,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
             children.add(root.childAt((int) mouseX, (int) mouseY));
         }
 
-        var pipeline = RenderPipelines.GUI;
+        var pipeline = GuiPipeline.DEFAULT;
 
         for (var child : children) {
             if (child instanceof ParentUIComponent parentComponent) {

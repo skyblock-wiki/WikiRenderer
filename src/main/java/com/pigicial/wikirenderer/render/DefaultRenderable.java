@@ -13,6 +13,7 @@ import com.pigicial.wikirenderer.property.DefaultPropertyBundle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Lightmap;
 import net.minecraft.client.renderer.LightmapRenderStateExtractor;
+import net.minecraft.client.renderer.RenderPassLayouts;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.LightmapRenderState;
@@ -127,7 +128,7 @@ public abstract class DefaultRenderable<P extends DefaultPropertyBundle> impleme
 
             try (RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
-                    .createRenderPass(() -> "Main render features", mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
+                    .createRenderPass(() -> "Main render features", RenderPassLayouts.COLOR_DEPTH, mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
 
                 RenderSystem.bindDefaultUniforms(renderPass);
                 FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);

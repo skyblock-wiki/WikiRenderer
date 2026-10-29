@@ -143,7 +143,7 @@ public class VanillaWidgetComponent extends BaseUIComponent {
 
     @Override
     public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
-        this.widget.extractRenderState(graphics, mouseX, mouseY, 0);
+        this.widget.extractRenderState(graphics);
     }
 
     @Override

@@ -16,6 +16,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiFunction;
 
@@ -99,8 +100,8 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
             }
         }
 
-        ScreenEvents.afterExtract(this).register((screen, drawContext, mouseX, mouseY, tickDelta) -> {
-            this.drawComponentTooltip(drawContext, mouseX, mouseY, tickDelta);
+        ScreenEvents.afterExtract(this).register((screen, graphics) -> {
+            this.drawComponentTooltip(graphics, graphics.mouseX(), graphics.mouseY(), graphics.partialTicks());
         });
     }
 
@@ -122,12 +123,14 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
+    public void extractBackground(@NonNull GuiGraphicsExtractor graphics) {
+
+    }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics) {
         if (!this.invalid) {
-            super.extractRenderState(graphics, mouseX, mouseY, a);
+            super.extractRenderState(graphics);
         } else {
             this.onClose();
         }
