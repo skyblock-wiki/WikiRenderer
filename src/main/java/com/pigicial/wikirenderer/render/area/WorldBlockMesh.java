@@ -222,6 +222,7 @@ public class WorldBlockMesh {
             }));
         }
 
+        BlockPos min = bounds.getMinCorner();
         if (sectionRenderDispatcher != null) {
             sectionRenderDispatcher.lock();
             int lastTransparentGroupHash = 0;
@@ -229,6 +230,7 @@ public class WorldBlockMesh {
             try {
                 for (SectionRenderDispatcher.RenderSection section : sortedSections) {
                     SectionMesh sectionMesh = section.getSectionMesh();
+                    BlockPos renderOrigin = section.getRenderOrigin();
                     int sectionInfoDataIndex = -1;
 
                     for (ChunkSectionLayer layer : ChunkSectionLayer.values()) {
@@ -237,7 +239,7 @@ public class WorldBlockMesh {
                         if (slice != null && draw != null && (!draw.hasCustomIndexBuffer() || slice.indexBuffer() != null)) {
                             if (sectionInfoDataIndex == -1) {
                                 sectionInfoDataIndex = sectionInfos.size();
-                                sectionInfos.add(new DynamicGpuData.ChunkSectionInfo(0, 0, 0, 1.0f));
+                                sectionInfos.add(new DynamicGpuData.ChunkSectionInfo(renderOrigin.getX() - min.getX(), renderOrigin.getY() - min.getY(), renderOrigin.getZ() - min.getZ(), 1.0f));
                             }
 
                             int combinedHash = 173;
