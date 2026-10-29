@@ -40,6 +40,7 @@ public class EntityCloner {
             leashableClone.setLeashData(leashableSource.getLeashData());
         }
 
+        clonedEntity.setId(Integer.MAX_VALUE); // if id is 0 (not set), it fails
         clonedEntity.tick();
 
         clonedEntity.setXRot(source.getXRot());
@@ -54,7 +55,6 @@ public class EntityCloner {
             livingClone.getAttributes().assignAllValues(livingSource.getAttributes());
         }
 
-        clonedEntity.setId(Integer.MAX_VALUE); // if id is 0 (not set), it fails
         return clonedEntity;
     }
 
