@@ -32,6 +32,11 @@ public class ContainerScreenRenderable extends DefaultRenderable<ContainerScreen
     public ScreenSizeData previewScreenSizeData;
     private List<Integer> lastSeenAnimationTimings = null;
 
+    // this has to be cached / init has to be saved because tooltips render with a delay, so if you re-initialize each frame, the tooltip data resets, and
+    // tooltips therefore never render
+    private int lastInitWidth = -1;
+    private int lastInitHeight = -1;
+
     public ContainerScreenRenderable(AbstractContainerScreen<?> containerScreen) {
         this.containerScreen = containerScreen;
     }
@@ -126,8 +131,11 @@ public class ContainerScreenRenderable extends DefaultRenderable<ContainerScreen
 
         client.gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_3D);
 
-        containerScreen.init(guiScaledWidth, guiScaledHeight);
-        containerScreen.resize(guiScaledWidth, guiScaledHeight);
+        if (guiScaledWidth != lastInitWidth || guiScaledHeight != lastInitHeight) {
+            containerScreen.init(guiScaledWidth, guiScaledHeight);
+            lastInitWidth = guiScaledWidth;
+            lastInitHeight = guiScaledHeight;
+        }
 
         containerScreen.extractRenderStateWithTooltipAndSubtitles(guiGraphics);
         guiRenderer.render();

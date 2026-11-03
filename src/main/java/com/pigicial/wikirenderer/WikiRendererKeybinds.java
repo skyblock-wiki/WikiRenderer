@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.inventory.SlotWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -148,12 +149,12 @@ public class WikiRendererKeybinds {
                 return null;
             }
 
-            Slot hoveredSlot = ((AbstractContainerScreenAccessor) containerScreen).getHoveredSlot();
+            SlotWidget hoveredSlot = ((AbstractContainerScreenAccessor) containerScreen).wikirenderer$getHoveredSlot();
             if (hoveredSlot == null) {
                 return null;
             }
 
-            ItemStack hoveredItem = hoveredSlot.getItem();
+            ItemStack hoveredItem = hoveredSlot.slot().getItem();
             if (!hoveredItem.isEmpty()) {
                 return hoveredItem;
             }
