@@ -96,7 +96,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
         List<Iterable<BlockPos>> blockPositionsForBuilding = mesh.bounds.buildBlockPositionsForSubMesh(getFrom(), getTo());
         for (Iterable<BlockPos> positions : blockPositionsForBuilding) {
             if (mesh.buildingCancelled) {
-                builders.discardAll();
+                builders.close();
                 setNotDirty();
                 return;
             }
@@ -135,7 +135,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
         }
 
         if (mesh.buildingCancelled) {
-            builders.discardAll();
+            builders.close();
             setNotDirty();
             return;
         }
@@ -154,42 +154,48 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
 
         if (mesh.buildingCancelled) {
             results.release();
+            builders.close();
             setNotDirty();
             return;
         }
 
+        // the per-compile SectionBufferBuilderPack owns native memory and must be closed once its meshes are uploaded
         client.execute((() -> {
-            if (mesh.buildingCancelled) {
-                results.release();
-                setNotDirty();
-                return;
-            }
-
-            if (results.renderedLayers.isEmpty()) {
-                reset();
-                setNotDirty();
-                this.blockEntities = blockEntities;
-                return;
-            }
-
-            CompiledSectionMesh compiledSectionMesh = new CompiledSectionMesh(null, results);
-
-            for (Map.Entry<ChunkSectionLayer, MeshData> entry : results.renderedLayers.entrySet()) {
-                MeshData meshData = entry.getValue();
-                boolean success = false;
-                while (!success) {
-                    success = ((RenderSectionInvoker) this).wikirenderer$addSectionBuffersToUberBuffer(entry.getKey(), compiledSectionMesh, meshData.vertexBuffer(), meshData.indexBuffer());
-                    if (!success && !RenderSystem.isOnRenderThread()) {
-                        Thread.onSpinWait();
-                    }
+            try {
+                if (mesh.buildingCancelled) {
+                    results.release();
+                    setNotDirty();
+                    return;
                 }
 
-                meshData.close();
-            }
+                if (results.renderedLayers.isEmpty()) {
+                    reset();
+                    setNotDirty();
+                    this.blockEntities = blockEntities;
+                    return;
+                }
 
-            this.animationCompletionTimings = animationCompletionTimings;
-            this.blockEntities = blockEntities;
-            setNotDirty();
+                CompiledSectionMesh compiledSectionMesh = new CompiledSectionMesh(null, results);
+
+                for (Map.Entry<ChunkSectionLayer, MeshData> entry : results.renderedLayers.entrySet()) {
+                    MeshData meshData = entry.getValue();
+                    boolean success = false;
+                    while (!success) {
+                        success = ((RenderSectionInvoker) this).wikirenderer$addSectionBuffersToUberBuffer(entry.getKey(), compiledSectionMesh, meshData.vertexBuffer(), meshData.indexBuffer());
+                        if (!success && !RenderSystem.isOnRenderThread()) {
+                            Thread.onSpinWait();
+                        }
+                    }
+
+                    meshData.close();
+                }
+
+                this.animationCompletionTimings = animationCompletionTimings;
+                this.blockEntities = blockEntities;
+                setNotDirty();
+            } finally {
+                builders.close();
+            }
         }));
 
         BlockModelLighter.clearCache();
