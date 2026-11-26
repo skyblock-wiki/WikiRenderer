@@ -1,10 +1,9 @@
 package com.pigicial.wikirenderer.render.area;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.SectionBufferBuilder;
 import com.pigicial.wikirenderer.mixin.access.RenderSectionInvoker;
 import com.pigicial.wikirenderer.util.AnimationTimingUtil;
 import net.minecraft.client.Minecraft;
@@ -31,7 +30,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
-    public static final int RENDER_SECTION_SIZE = 32; // vanilla is 16, but it seems 32 is perfectly doable without hitting vertex limits
+    public static final int RENDER_SECTION_SIZE = SectionPos.SECTION_SIZE;
     private final int sectionX;
     private final int sectionY;
     private final int sectionZ;
@@ -60,7 +59,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
     }
 
     public BlockPos getFrom() {
-        return new BlockPos(sectionToBlockCoordinate(sectionX), sectionToBlockCoordinate(sectionY), sectionToBlockCoordinate(sectionZ));
+        return new BlockPos(SectionPos.sectionToBlockCoord(sectionX), SectionPos.sectionToBlockCoord(sectionY), SectionPos.sectionToBlockCoord(sectionZ));
     }
 
     @Override
@@ -72,6 +71,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
         return getFrom().offset(RENDER_SECTION_SIZE - 1, RENDER_SECTION_SIZE - 1, RENDER_SECTION_SIZE - 1);
     }
 
+    // based on SectionCompiler#compile
     public void buildAndSubmit(WorldBlockMesh mesh) {
         if (isBuilding) return;
         isBuilding = true;
@@ -85,17 +85,21 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
         List<Integer> animationCompletionTimings = new LinkedList<>();
         Map<BlockPos, BlockEntity> blockEntities = new ConcurrentHashMap<>();
 
-        PoseStack poseStack = new PoseStack();
-        HashMap<ChunkSectionLayer, BufferBuilder> startedLayers = new HashMap<>();
+        HashMap<ChunkSectionLayer, SectionBufferBuilder> startedLayers = new HashMap<>();
         SectionBufferBuilderPack builders = new SectionBufferBuilderPack();
 
         BlockQuadOutput quadOutput = (x, y, z, quad, instance) -> {
-            BufferBuilder builder = mesh.getOrBeginLayer(startedLayers, builders, quad.materialInfo().layer());
-            builder.putBlockBakedQuad(x, y, z, quad, instance);
+            ChunkSectionLayer layerx = quad.materialInfo().layer();
+            SectionBufferBuilder builderx = mesh.getOrBeginLayer(startedLayers, builders, layerx);
+            builderx.addQuad(x, y, z, quad, instance);
         };
         BlockQuadOutput opaqueQuadOutput = (x, y, z, quad, instance) -> {
-            BufferBuilder builder = mesh.getOrBeginLayer(startedLayers, builders, ChunkSectionLayer.SOLID);
-            builder.putBlockBakedQuad(x, y, z, quad, instance);
+            SectionBufferBuilder builderx = mesh.getOrBeginLayer(startedLayers, builders, ChunkSectionLayer.SOLID);
+            builderx.addQuad(x, y, z, quad, instance);
+        };
+        FluidRenderer.Output fluidOutput = (layerx, x, y, z, quad, color, brightness, lightCoords) -> {
+            SectionBufferBuilder builderx = mesh.getOrBeginLayer(startedLayers, builders, layerx);
+            builderx.addFluidQuad(x, y, z, quad, color, brightness, lightCoords);
         };
 
         BlockModelLighter.enableCaching();
@@ -119,17 +123,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
 
                 FluidState fluidState = mesh.world.getFluidState(pos);
                 if (!fluidState.isEmpty()) {
-
-                    poseStack.pushPose();
-                    poseStack.translate(
-                            sectionRelative(pos.getX()) - (pos.getX() & 15),
-                            sectionRelative(pos.getY()) - (pos.getY() & 15),
-                            sectionRelative(pos.getZ()) - (pos.getZ() & 15)
-                    );
-                    //FluidVertexConsumer is used because insert pos into tesselarate will break what it thinks the water looks like (height/adjacent blocks and whatnot)
-                    FluidRenderer.Output fluidOutput = l -> new FluidVertexConsumer(mesh.getOrBeginLayer(startedLayers, builders, l), poseStack.last().pose(), poseStack.last().normal());
                     fluidRenderer.tesselate(mesh.world, pos, fluidOutput, blockState, fluidState);
-                    poseStack.popPose();
                 }
 
                 if (blockState.getRenderShape() == RenderShape.MODEL) {
@@ -138,7 +132,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
                     AnimationTimingUtil.scanTicksToFullyAnimateBlock(model, animationCompletionTimings, randomSeed);
 
                     BlockQuadOutput output = ModelBlockRenderer.forceOpaque(cutoutLeaves, blockState) ? opaqueQuadOutput : quadOutput;
-                    blockRenderer.tesselateBlock(output, sectionRelative(pos.getX()), sectionRelative(pos.getY()), sectionRelative(pos.getZ()), mesh.world, pos, blockState, model, randomSeed);
+                    blockRenderer.tesselateBlock(output, SectionPos.sectionRelative(pos.getX()), SectionPos.sectionRelative(pos.getY()), SectionPos.sectionRelative(pos.getZ()), mesh.world, pos, blockState, model, randomSeed);
                 }
             }
         }
@@ -155,7 +149,7 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
             MeshData builtMesh = bufferBuilder.build();
             if (builtMesh != null) {
                 if (layer == ChunkSectionLayer.TRANSLUCENT && mesh.orthographicTransparencySorting != null) {
-                    results.transparencyState = builtMesh.sortQuads(builders.buffer(layer), mesh.orthographicTransparencySorting);
+                    results.transparencyState = builtMesh.sortQuads(builders.buffer(layer), mesh.orthographicTransparencySorting, layer);
                 }
                 results.renderedLayers.put(layer, builtMesh);
             }
@@ -272,15 +266,4 @@ public class MeshRenderSection extends SectionRenderDispatcher.RenderSection {
         return SectionPos.asLong(sectionX, sectionY, sectionZ);
     }
 
-    public static int getSection(int block) {
-        return block >> 5;
-    }
-
-    public static int sectionToBlockCoordinate(int sectionCoordinate) {
-        return sectionCoordinate << 5;
-    }
-
-    public static int sectionRelative(int blockCoord) {
-        return blockCoord & 31;
-    }
 }

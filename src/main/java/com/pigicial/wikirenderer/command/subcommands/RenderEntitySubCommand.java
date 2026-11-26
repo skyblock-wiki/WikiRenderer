@@ -16,9 +16,9 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.ResourceArgument;
+import net.minecraft.commands.suggestions.SuggestionContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -51,7 +51,7 @@ public class RenderEntitySubCommand extends WikiRendererSubCommand {
     public static final List<? extends EntityType<?>> DEFAULT_INVISIBLE_ENTITY_TYPES;
 
     static {
-        CLIENT_SUMMONABLE_ENTITIES = (_, builder) -> SharedSuggestionProvider.suggestResource(
+        CLIENT_SUMMONABLE_ENTITIES = (_, builder) -> SuggestionContext.suggestResource(
                 BuiltInRegistries.ENTITY_TYPE.stream().filter(EntityType::canSummon),
                 builder,
                 EntityType::getKey,
@@ -83,7 +83,7 @@ public class RenderEntitySubCommand extends WikiRendererSubCommand {
                     RenderEntitySubCommand.renderTargetedEntity(context);
                     return 0;
                 })
-                .then(argument("entity", ResourceArgument.resource(access, Registries.ENTITY_TYPE))
+                .then(argument("entity", ResourceArgument.resource(Registries.ENTITY_TYPE))
                         .suggests(CLIENT_SUMMONABLE_ENTITIES)
                         .executes(context -> {
                             this.renderEntity(context, false);

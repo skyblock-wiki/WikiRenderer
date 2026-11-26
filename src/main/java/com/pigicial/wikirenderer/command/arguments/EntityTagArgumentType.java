@@ -8,10 +8,11 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.suggestions.SuggestionContext;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -27,8 +28,8 @@ public class EntityTagArgumentType implements ArgumentType<EntityTagArgumentType
 
     private final HolderLookup.RegistryLookup<EntityType<?>> registryWrapper;
 
-    public EntityTagArgumentType(CommandBuildContext registryAccess) {
-        this.registryWrapper = registryAccess.lookupOrThrow(Registries.ENTITY_TYPE);
+    public EntityTagArgumentType() {
+        this.registryWrapper = VanillaRegistries.createWorldLookup().lookupOrThrow(Registries.ENTITY_TYPE);
     }
 
     public static <S> EntityTagArgumentType.TagArgument getTag(String name, CommandContext<S> context) {
@@ -46,7 +47,7 @@ public class EntityTagArgumentType implements ArgumentType<EntityTagArgumentType
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggestResource(this.registryWrapper.listTags().map(named -> named.key().location()), builder, String.valueOf('#'));
+        return SuggestionContext.suggestResource(this.registryWrapper.listTags().map(named -> named.key().location()), builder, String.valueOf('#'));
     }
 
     public record TagArgument(Identifier id, HolderSet<EntityType<?>> entries) {}

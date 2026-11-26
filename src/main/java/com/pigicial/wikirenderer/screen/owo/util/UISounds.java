@@ -8,6 +8,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 public final class UISounds {
 
@@ -17,7 +18,7 @@ public final class UISounds {
 
     @Environment(EnvType.CLIENT)
     public static void play(SoundEvent event) {
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(event, 1));
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forPreview(event, SoundSource.UI, 1));
     }
 
     @Environment(EnvType.CLIENT)

@@ -48,7 +48,7 @@ public class RenderablePlayerEntity extends LocalPlayer {
                                 Minecraft.getInstance().level.registryAccess().freeze(),
                                 Minecraft.getInstance().level.enabledFeatures(),
                                 "Wisp Forest Enterprises", null, null, Map.of(), null, Map.of(), ServerLinks.EMPTY, Map.of(),
-                                true
+                                true, null
                         )),
                 new StatsCounter(),
                 new ClientRecipeBook(),

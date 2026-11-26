@@ -42,7 +42,7 @@ public class RenderItemSubCommand extends WikiRendererSubCommand {
                     this.renderItemInHand(context);
                     return 0;
                 })
-                .then(literal("id").then(argument("item", ItemArgument.item(access))
+                .then(literal("id").then(argument("item", ItemArgument.item())
                         .executes(context -> {
                             this.renderItemWithArgument(context);
                             return 0;

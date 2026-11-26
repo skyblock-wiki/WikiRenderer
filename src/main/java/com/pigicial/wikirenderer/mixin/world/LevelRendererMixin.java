@@ -21,7 +21,7 @@ public class LevelRendererMixin {
                     target = "Lnet/minecraft/client/renderer/LevelRenderer;executeOutline(Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;)V"
             )
     )
-    public void drawAreaSelection(GpuBufferSlice terrainFog, boolean useImprovedTransparency, ChunkSectionsToRender chunkSectionsToRender, FeatureRenderDispatcher.PreparedFrame featureFrame, boolean hasAlwaysOnTopGizmos, boolean consistentDepthRequired, CallbackInfo ci) {
+    public void drawAreaSelection(GpuBufferSlice fogBuffer, FeatureRenderDispatcher.PreparedFrame featureFrame, boolean useImprovedTransparency, ChunkSectionsToRender chunkSectionsToRender, boolean hasAlwaysOnTopGizmos, boolean consistentDepthRequired, CallbackInfo ci) {
         AreaSelectionHelper.renderSelectionBox();
     }
 

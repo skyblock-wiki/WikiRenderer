@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pigicial.wikirenderer.util.EntityNBTValidityFilter;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.suggestions.SuggestionContext;
 import net.minecraft.network.chat.Component;
 
 import java.util.concurrent.CompletableFuture;
@@ -41,7 +41,7 @@ public class EntityNBTFilterTypeArgumentType implements ArgumentType<EntityNBTVa
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(new String[]{"require_all_valid", "require_one_valid", "require_none_valid"}, builder);
+        return SuggestionContext.suggest(new String[]{"require_all_valid", "require_one_valid", "require_none_valid"}, builder);
     }
 
 }

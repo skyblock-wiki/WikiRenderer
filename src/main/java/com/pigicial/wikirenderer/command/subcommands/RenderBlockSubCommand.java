@@ -35,7 +35,7 @@ public class RenderBlockSubCommand extends WikiRendererSubCommand {
                     RenderBlockSubCommand.renderTargetedBlock(context);
                     return 0;
                 })
-                .then(argument("block", BlockStateArgument.block(access))
+                .then(argument("block", BlockStateArgument.block())
                         .executes(context -> {
                             this.renderBlockWithArgument(context);
                             return 0;

@@ -55,7 +55,7 @@ public class TooltipRenderable extends DefaultRenderable<TooltipPropertyBundle> 
             WikiRenderer.skipTooltipBackgroundRender = true;
         }
         GuiGraphicsExtractor guiGraphics = new GuiGraphicsExtractor(client, state, xScale, yScale);
-        guiGraphics.tooltip(client.font, list, 0, 0, this::positionTooltip, this.stack.get(DataComponents.TOOLTIP_STYLE), false);
+        guiGraphics.tooltip(client.font, list, 0, 0, this::positionTooltip, this.stack.get(DataComponents.TOOLTIP_STYLE), 0);
 
         WikiRenderer.skipTooltipBackgroundRender = false;
 

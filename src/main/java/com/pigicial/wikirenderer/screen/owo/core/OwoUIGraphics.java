@@ -206,7 +206,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
     }
 
     public void drawTooltip(Font textRenderer, int x, int y, List<ClientTooltipComponent> components, @Nullable Identifier texture) {
-        ((GuiGraphicsExtractorAccessor) this).owo$tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE, texture, false);
+        ((GuiGraphicsExtractorAccessor) this).owo$tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE, texture, 0);
     }
 
     // --- debug rendering ---

@@ -2,16 +2,13 @@ package com.pigicial.wikirenderer.render.area;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.SectionBufferBuilder;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
-import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.IndexType;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
-import com.mojang.renderpearl.api.pipeline.RenderPassLayout;
 import com.mojang.renderpearl.api.textures.AddressMode;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.mojang.renderpearl.api.textures.GpuSampler;
@@ -30,10 +27,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.TextureFilteringMethod;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.DynamicGpuData;
-import net.minecraft.client.renderer.RenderPassLayouts;
-import net.minecraft.client.renderer.SectionBufferBuilderPack;
-import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockModelLighter;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.state.BeaconRenderState;
@@ -44,6 +38,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
@@ -167,14 +162,14 @@ public class WorldBlockMesh {
 
                 GpuTextureView blockAtlas = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).textureView();
                 if (blocksToRender != null) {
-                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, null, false);
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.OPAQUE, renderPass, terrainSampler, blockAtlas, null, false, false);
                 }
 
                 frame.executeSolid(renderPass);
 
                 frame.executeTranslucent(renderPass); // this requires non-OIT, which is why there's WikiRenderer.NODE_STORAGE (defaults to non-oit)
                 if (blocksToRender != null) {
-                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, null, false);
+                    blocksToRender.renderGroup(ChunkSectionLayerGroup.TRANSLUCENT, renderPass, terrainSampler, blockAtlas, null, false, false);
                 }
                 frame.executeTranslucentAfterTerrain(renderPass);
             }
@@ -228,24 +223,18 @@ public class WorldBlockMesh {
         if (sectionRenderDispatcher != null) {
             sectionRenderDispatcher.lock();
             int lastTransparentGroupHash = 0;
+            int formatSizeBytes = BindGroupLayouts.TERRAIN_VERTEX_TEXEL_FORMAT.blockSize();
 
             try {
                 for (SectionRenderDispatcher.RenderSection section : sortedSections) {
                     SectionMesh sectionMesh = section.getSectionMesh();
                     BlockPos renderOrigin = section.getRenderOrigin();
-                    int sectionInfoDataIndex = -1;
 
-                    for (ChunkSectionLayer layer : ChunkSectionLayer.values()) {
+                    for(ChunkSectionLayer layer : ChunkSectionLayer.values()) {
                         SectionMesh.SectionDraw draw = sectionMesh.getSectionDraw(layer);
                         SectionRenderDispatcher.RenderSectionBufferSlice slice = sectionRenderDispatcher.getRenderSectionSlice(sectionMesh, layer);
                         if (slice != null && draw != null && (!draw.hasCustomIndexBuffer() || slice.indexBuffer() != null)) {
-                            if (sectionInfoDataIndex == -1) {
-                                sectionInfoDataIndex = sectionInfos.size();
-                                sectionInfos.add(new DynamicGpuData.ChunkSectionInfo(renderOrigin.getX() - min.getX(), renderOrigin.getY() - min.getY(), renderOrigin.getZ() - min.getZ(), 1.0f));
-                            }
-
                             int combinedHash = 173;
-                            VertexFormat vertexFormat = layer.pipeline(false, false, false, null).getVertexFormatBinding(0);
                             GpuBuffer vertexBuffer = slice.vertexBuffer();
                             combinedHash = 31 * combinedHash + vertexBuffer.hashCode();
                             int firstIndex = 0;
@@ -263,10 +252,16 @@ public class WorldBlockMesh {
                                 indexType = draw.indexType();
                                 combinedHash = 31 * combinedHash + indexBuffer.hashCode();
                                 combinedHash = 31 * combinedHash + indexType.hashCode();
-                                firstIndex = (int) (slice.indexBufferOffset() / indexType.bytes);
+                                firstIndex = (int) (slice.indexBufferOffset() / (long) indexType.bytes);
                             }
 
-                            int baseVertex = (int) (slice.vertexBufferOffset() / vertexFormat.getVertexSize());
+                            long faceCount = Long.divideUnsigned(draw.indexCount(), 6L);
+                            long bakedFaceStartOffset = slice.vertexBufferOffset() + faceCount * (long) layer.vertexBufferFaceSize();
+                            int vertexStartIndex = (int) Long.divideUnsigned(slice.vertexBufferOffset(), formatSizeBytes);
+                            int bakedFaceStartIndex = (int) Long.divideUnsigned(bakedFaceStartOffset, formatSizeBytes);
+                            int sectionInfoDataIndex = sectionInfos.size();
+                            sectionInfos.add(new DynamicGpuData.ChunkSectionInfo(renderOrigin.getX() - min.getX(), renderOrigin.getY() - min.getY(), renderOrigin.getZ() - min.getZ(), 1.0f, vertexStartIndex, bakedFaceStartIndex));
+
                             ChunkDrawGroup drawGroup = null;
                             if (layer.translucent() && respectTranslucentOrder) {
                                 if (combinedHash == lastTransparentGroupHash) {
@@ -284,7 +279,7 @@ public class WorldBlockMesh {
                                 drawGroups.get(layer).add(drawGroup);
                             }
 
-                            drawGroup.draws.add(new DynamicGpuData.IndexedDraw(draw.indexCount(), 1, firstIndex, baseVertex, sectionInfoDataIndex));
+                            drawGroup.draws.add(new DynamicGpuData.IndexedDraw(draw.indexCount(), 1, firstIndex, 0, sectionInfoDataIndex));
                         }
                     }
                 }
@@ -305,7 +300,7 @@ public class WorldBlockMesh {
         int textureAtlasHeight = blockAtlas.getHeight(0);
 
         int largestIndexCount = this.extractSectionDrawGroups(respectTranslucentOrder, sectionInfos, drawGroups);
-        Map<ChunkSectionLayer, List<RenderPass.Draw<GpuBufferSlice[]>>> flattenDraws = Util.makeEnumMap(ChunkSectionLayer.class, _ -> new ReferenceArrayList<>());
+        Map<ChunkSectionLayer, List<ChunkSectionsToRender.DrawSeparateDrawGroup>> destDrawGroups = Util.makeEnumMap(ChunkSectionLayer.class, (_) -> new ReferenceArrayList<>());
 
         for (ChunkSectionLayer layer : ChunkSectionLayer.values()) {
             List<ChunkDrawGroup> sortedDrawGroups = drawGroups.get(layer);
@@ -314,28 +309,19 @@ public class WorldBlockMesh {
             }
 
             for (ChunkDrawGroup drawGroup : sortedDrawGroups) {
-                List<RenderPass.Draw<GpuBufferSlice[]>> dest = flattenDraws.get(layer);
                 List<DynamicGpuData.IndexedDraw> sortedDraws = drawGroup.draws;
                 if (layer.translucent() && respectTranslucentOrder) {
                     sortedDraws = sortedDraws.reversed();
                 }
 
+                List<RenderPass.Draw<GpuBufferSlice[]>> destDraws = new ArrayList<>(sortedDraws.size());
+
                 for (DynamicGpuData.IndexedDraw draw : sortedDraws) {
                     int sectionInfoDataIndex = draw.baseInstance();
-                    GpuBuffer indexBuffer = drawGroup.indexBuffer == null ? null : drawGroup.indexBuffer().buffer();
-                    dest.add(
-                            new RenderPass.Draw<>(
-                                    0,
-                                    drawGroup.vertexBuffer.buffer(),
-                                    indexBuffer,
-                                    drawGroup.indexType,
-                                    draw.firstIndex(),
-                                    draw.indexCount(),
-                                    draw.baseVertex(),
-                                    (sectionUbos, uploader) -> uploader.setUniform("ChunkSection", sectionUbos[sectionInfoDataIndex])
-                            )
-                    );
+                    destDraws.add(new RenderPass.Draw<>(draw.firstIndex(), draw.indexCount(), draw.baseVertex(), (sectionUbos, uploader) -> uploader.setUniform("ChunkSection", sectionUbos[sectionInfoDataIndex])));
                 }
+
+                destDrawGroups.get(layer).add(new ChunkSectionsToRender.DrawSeparateDrawGroup(drawGroup.vertexBuffer, drawGroup.indexBuffer, drawGroup.indexType, destDraws));
             }
         }
 
@@ -346,7 +332,7 @@ public class WorldBlockMesh {
             autoIndices.requestIndexCount(largestIndexCount);
         }
 
-        return new ChunkSectionsToRender.DrawSeparate(terrainTransformUbo, flattenDraws, largestIndexCount, chunkSectionInfos);
+        return new ChunkSectionsToRender.DrawSeparate(terrainTransformUbo, destDrawGroups, largestIndexCount, chunkSectionInfos);
     }
 
     public ChunkSectionsToRender prepareChunkRendersIndirect(final Matrix4fc modelViewMatrix, final boolean respectTranslucentOrder) {
@@ -573,12 +559,12 @@ public class WorldBlockMesh {
         BlockPos minCorner = this.bounds.getMinCorner();
         BlockPos maxCorner = this.bounds.getMaxCorner();
 
-        int minSectionX = MeshRenderSection.getSection(minCorner.getX());
-        int minSectionY = MeshRenderSection.getSection(minCorner.getY());
-        int minSectionZ = MeshRenderSection.getSection(minCorner.getZ());
-        int maxSectionX = MeshRenderSection.getSection(maxCorner.getX());
-        int maxSectionY = MeshRenderSection.getSection(maxCorner.getY());
-        int maxSectionZ = MeshRenderSection.getSection(maxCorner.getZ());
+        int minSectionX = SectionPos.blockToSectionCoord(minCorner.getX());
+        int minSectionY = SectionPos.blockToSectionCoord(minCorner.getY());
+        int minSectionZ = SectionPos.blockToSectionCoord(minCorner.getZ());
+        int maxSectionX = SectionPos.blockToSectionCoord(maxCorner.getX());
+        int maxSectionY = SectionPos.blockToSectionCoord(maxCorner.getY());
+        int maxSectionZ = SectionPos.blockToSectionCoord(maxCorner.getZ());
 
         for (int sectionX = minSectionX; sectionX <= maxSectionX; sectionX += 1) {
             for (int sectionY = minSectionY; sectionY <= maxSectionY; sectionY += 1) {
@@ -665,8 +651,8 @@ public class WorldBlockMesh {
         }
     }
 
-    protected BufferBuilder getOrBeginLayer(Map<ChunkSectionLayer, BufferBuilder> startedLayers, SectionBufferBuilderPack buffers, ChunkSectionLayer layer) {
-        return startedLayers.computeIfAbsent(layer, _ -> new BufferBuilder(buffers.buffer(layer), PrimitiveTopology.QUADS, layer.vertexFormat()));
+    protected SectionBufferBuilder getOrBeginLayer(Map<ChunkSectionLayer, SectionBufferBuilder> startedLayers, SectionBufferBuilderPack buffers, ChunkSectionLayer layer) {
+        return startedLayers.computeIfAbsent(layer, _ -> new SectionBufferBuilder(buffers.buffer(layer), PrimitiveTopology.QUADS, layer));
     }
 
     public Optional<List<Integer>> getAnimationCompletionTimings() {

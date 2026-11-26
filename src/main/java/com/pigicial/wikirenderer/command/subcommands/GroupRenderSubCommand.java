@@ -55,7 +55,7 @@ public class GroupRenderSubCommand extends WikiRendererSubCommand {
                                                     return 0;
                                                 }))))
                         .then(literal("tag")
-                                .then(argument("tag", new ItemTagArgumentType(access))
+                                .then(argument("tag", ItemTagArgumentType.itemTag())
                                         .then(argument("task", new ItemBatchRenderTaskArgumentType())
                                                 .executes(context -> {
                                                     this.renderItemTagContents(context);
@@ -82,7 +82,7 @@ public class GroupRenderSubCommand extends WikiRendererSubCommand {
                                                                     return 0;
                                                                 }))))))
                         .then(literal("tag")
-                                .then(argument("tag", new EntityTagArgumentType(access))
+                                .then(argument("tag", new EntityTagArgumentType())
                                         .executes(context -> {
                                             this.renderEntityTagContents(context, false, false);
                                             return 0;

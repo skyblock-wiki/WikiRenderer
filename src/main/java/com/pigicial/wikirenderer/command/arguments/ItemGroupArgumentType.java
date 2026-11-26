@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.suggestions.SuggestionContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
@@ -34,6 +34,6 @@ public class ItemGroupArgumentType implements ArgumentType<CreativeModeTab> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggestResource(CreativeModeTabs.allTabs().stream().map(BuiltInRegistries.CREATIVE_MODE_TAB::getKey), builder);
+        return SuggestionContext.suggestResource(CreativeModeTabs.allTabs().stream().map(BuiltInRegistries.CREATIVE_MODE_TAB::getKey), builder);
     }
 }

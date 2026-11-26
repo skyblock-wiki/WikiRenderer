@@ -1,11 +1,11 @@
 package com.pigicial.wikirenderer.render.area.bounds;
 
 import com.pigicial.wikirenderer.render.area.AreaPropertyBundle;
-import com.pigicial.wikirenderer.render.area.MeshRenderSection;
 import com.pigicial.wikirenderer.render.area.WorldBlockMesh;
 import com.pigicial.wikirenderer.render.area.side_view.ExpansionSide;
 import com.pigicial.wikirenderer.render.area.side_view.MeshSideRotation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.AABB;
 
@@ -97,12 +97,12 @@ public class SingleCuboidMeshBounds implements ExpandableMeshBounds {
         AABB dirtyZone = increasing ? getBoxDelta(newBox, oldBox) : getBoxDelta(oldBox, newBox);
         if (dirtyZone == null) return;
 
-        int minSX = MeshRenderSection.getSection((int) Math.floor(dirtyZone.minX));
-        int minSY = MeshRenderSection.getSection((int) Math.floor(dirtyZone.minY));
-        int minSZ = MeshRenderSection.getSection((int) Math.floor(dirtyZone.minZ));
-        int maxSX = MeshRenderSection.getSection((int) Math.ceil(dirtyZone.maxX) - 1);
-        int maxSY = MeshRenderSection.getSection((int) Math.ceil(dirtyZone.maxY) - 1);
-        int maxSZ = MeshRenderSection.getSection((int) Math.ceil(dirtyZone.maxZ) - 1);
+        int minSX = SectionPos.blockToSectionCoord((int) Math.floor(dirtyZone.minX));
+        int minSY = SectionPos.blockToSectionCoord((int) Math.floor(dirtyZone.minY));
+        int minSZ = SectionPos.blockToSectionCoord((int) Math.floor(dirtyZone.minZ));
+        int maxSX = SectionPos.blockToSectionCoord((int) Math.ceil(dirtyZone.maxX) - 1);
+        int maxSY = SectionPos.blockToSectionCoord((int) Math.ceil(dirtyZone.maxY) - 1);
+        int maxSZ = SectionPos.blockToSectionCoord((int) Math.ceil(dirtyZone.maxZ) - 1);
 
         for (int x = minSX; x <= maxSX; x++) {
             for (int y = minSY; y <= maxSY; y++) {

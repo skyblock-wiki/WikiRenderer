@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pigicial.wikirenderer.render.batch.ItemBatchRenderTask;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.suggestions.SuggestionContext;
 import net.minecraft.network.chat.Component;
 
 import java.util.concurrent.CompletableFuture;
@@ -52,9 +52,9 @@ public class ItemBatchRenderTaskArgumentType implements ArgumentType<ItemBatchRe
         String input = builder.getRemaining();
 
         if (input.codePoints().filter(value -> value == ' ').findAny().isPresent() && input.contains("batch")) {
-            return SharedSuggestionProvider.suggest(new String[]{"items", "blocks", "tooltips"}, builder.createOffset(builder.getStart() + 6));
+            return SuggestionContext.suggest(new String[]{"items", "blocks", "tooltips"}, builder.createOffset(builder.getStart() + 6));
         } else {
-            return SharedSuggestionProvider.suggest(new String[]{"itematlas", "batch"}, builder);
+            return SuggestionContext.suggest(new String[]{"itematlas", "batch"}, builder);
         }
     }
 

@@ -28,7 +28,7 @@ public class RenderItemTooltipSubCommand extends WikiRendererSubCommand {
                     renderHeldItemTooltip(context);
                     return 0;
                 })
-                .then(argument("item", ItemArgument.item(access))
+                .then(argument("item", ItemArgument.item())
                         .executes(context -> {
                             renderItemTooltipWithArgument(context);
                             return 0;

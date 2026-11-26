@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationTrigger;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -265,14 +266,14 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
     }
 
     @Override
-    public @NonNull NarrationPriority narrationPriority() {
-        return NarrationPriority.NONE;
-    }
-
-    @Override
     public void updateNarration(@NonNull NarrationElementOutput builder) {}
 
     public static boolean isRendering() {
         return isRendering;
+    }
+
+    @Override
+    public NarrationPriority narrationPriority(NarrationTrigger narrationTrigger) {
+        return NarrationPriority.NONE;
     }
 }
